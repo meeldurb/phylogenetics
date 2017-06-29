@@ -21,14 +21,16 @@ library("phangorn")
 library("plyr")
 require("seqinr")
 
-source(paste('C:/Users/meeldurb/Documents/WUR/Master',
-             '/Internship/Beast_dating_salmonids/Beast_Rscripts/',
-             'auto.root_salmonid_clans_v1.R', sep = "" ))
+source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
+             'Master_internship_phylogenetics/phylogenetics/',
+             'auto.root_salmonid_clans_MvdB.R', sep = "" ))
 
-source(paste('C:/Users/meeldurb/Documents/WUR/Master',
-             '/Internship/Beast_dating_salmonids/Beast_Rscripts/',
-             'orthologfinder_oct2016.R', sep = ""))
+source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
+             'Master_internship_phylogenetics/phylogenetics/',
+             'orthologfinder_MvdB.R', sep = ""))
 
+
+#C:\Users\meeldurb\Dropbox\Melanie\Master_internship_phylogenetics\phylogenetics
 ####____________load data______________####
 
 # prepare homeolog table
@@ -105,14 +107,14 @@ alis <- file.path('C:/Users/meeldurb/Documents/WUR/Master',
                   'OG0000115_2_aln.fa')
 
 # get preparation xml file
-xml <- readLines(file.path('C:/Users/meeldurb/Documents/WUR/Master',
-                           '/Internship/Beast_dating_salmonids/Dummy_beast_input/',
+xml <- readLines(file.path('C:/Users/meeldurb/Dropbox/Melanie/',
+                           'Beast_dating_salmonids/Dummy_beast_input/',
                            'test_beauti.xml'))
 
 
 # get the orthologs
-load(file.path('C:/Users/meeldurb/Documents/WUR/Master',
-               '/Internship/Beast_dating_salmonids/',
+load(file.path('C:/Users/meeldurb/Dropbox/Melanie/',
+               'Beast_dating_salmonids/',
                'orthologs_list_20161115.RData'))
 
 
