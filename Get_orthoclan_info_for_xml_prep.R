@@ -47,28 +47,51 @@ OG_trees <- loadRData(paste('C:/Users/meeldurb/Google Drive/Master internship ',
                     'Orthologs_homeologs/orthogroups.03.06.2017/',
                     'OG_trees.30.05.2017.RData', sep = ''))
 
-length(OG_trees) # total orthogroups
-# table(sapply(OG_trees, function(i) sum(c('Ssal', 'Omyk') %in% substr(i$tip.label, 1, 4)))) ## ==> a way of summing up number of specific species in trees.
+# total number of orthogroups
+length(OG_trees) 
+# summing up number of specific species in trees.
+table(sapply(OG_trees, function(i) sum(c('Ssal', 'Omyk') %in% substr(i$tip.label, 1, 4))))
 
 # 2) make clans using clanfinder
+
 OG_clanfinder = lapply(OG_trees, clanFinder, ut = c('Olat', 'Gacu', 'Drer', 'Locu', 'Mmus', 'Hsap'))
 
-# show melanie:
+# Play a bit with the datastructure
 names(OG_trees)
+# the names of the trees in the different OG groups are named by a integer
+names(OG_clanfinder)
+names(OG_clanfinder[1])
 names(OG_clanfinder[[1]])
+names(OG_clanfinder$OG0000000.)
+OG_clanfinder[[1]][1]
 
-# fix names
+# 3) fixing names
+
+# some of the OG clans are empty, we need to remove these
 OG_clanfinder.filt <- OG_clanfinder[sapply(OG_clanfinder, length)>0]
+length(OG_clanfinder)
+length(OG_clanfinder.filt)
+
+
 clans.num <- as.numeric(unlist(sapply(OG_clanfinder.filt, function(i) 1:length(i))))
-OG_clans = unlist(OG_clanfinder.filt, recursive = F)
+OG_clans <- unlist(OG_clanfinder.filt, recursive = F)
+head(names(OG_clans))
 names(OG_clans) <- paste(substr(names(OG_clans), 1, 9), paste(clans.num, '.', sep=''), sep='_')
-length(OG_clans) # total clans
+head(names(OG_clans))
+# total clans
+length(OG_clans) 
 table(sapply(OG_clans, function(i) sum(c('Ssal', 'Omyk') %in% substr(i$tip.label, 1, 4))))
 
 
 
-# fix omyk names in trees...
-name.tab = read.table('~/Google Drive/Salmonid_genomics_resources/Orthologs_homeologs/orthogroups.03.06.2017/Omyk.gene2protein.table.txt', header = T)
+
+# fix O.mykiss names in trees from proteinID to geneID
+# taken from this dataframe
+name.tab = read.table(paste('C:/users/meeldurb/Google Drive/', 
+                            'Master internship phylogenetics salmonids/',
+                            'Salmonid_genomics_resources/Orthologs_homeologs/', 
+                            'orthogroups.03.06.2017/Omyk.gene2protein.table.txt', 
+                            sep = ''), header = T)
 
 OG_clans = lapply(OG_clans, function(i){
   tr = i
