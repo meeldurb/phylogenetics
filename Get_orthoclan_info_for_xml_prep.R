@@ -1,7 +1,7 @@
 #!usr/bin/env Rscript
 
 ###################################################################
-##Author: Melanie van den Bosch
+##Author: Melanie van den Bosch & Simen Rod Sandve
 ##Script for loading and manipulating the orthoclan information
 ###################################################################
 
@@ -10,30 +10,29 @@
 ##_____ load libraries and functions _____##
 #------------------------------------------#
 
-install.packages('RCurl',  repos = "http://cran.rstudio.com/")
+#install.packages('RCurl',  repos = "http://cran.rstudio.com/")
 #install.packages("ape", repos = "http://cran.rstudio.com/")
 #install.packages("phangorn", repos = "http://cran.rstudio.com/")
 
 library(RCurl)
 library(ape)
 library(phangorn)
+library(seqinr)
 
 
 
-# source_github <- function(u) {
-#   # load package
-#   require(RCurl)
-#   # read script lines from website
-#   script <- getURL(u, ssl.verifypeer = FALSE)
-#   # parase lines and evealuate in the global environement
-#   eval(parse(text = script))
-# }
-# 
-# source("https://github.com/srsand/Phylogenomics/blob/master/clanfinder.R")
+source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
+             'Master_internship_phylogenetics/',
+             'Phylogenomics/clanfinder.R', sep = ''))
+source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
+             'Master_internship_phylogenetics/',
+             'Phylogenomics/Phylo_functions.R', sep = ''))
 
-source('~/Dropbox/Work/R-resources/Rfunctions/Phylogenomics/clanfinder.R')
-source('~/Dropbox/Work/R-resources/Rfunctions/Phylo_functions.R')
-
+loadRData <- function(fileName){
+  #loads an RData file, and returns it
+  load(fileName)
+  get(ls()[ls() != "fileName"])
+}
 
 #-------------------------------------------------#
 ##____ make initial clans from protein trees ____##
@@ -41,16 +40,21 @@ source('~/Dropbox/Work/R-resources/Rfunctions/Phylo_functions.R')
 
 # 1) get clans from orthogroups
 
-#load orthotrees - output from protein trees made from orthogroup sets of sequences (from orthofinder)
-load('~/Google Drive/Salmonid_genomics_resources/Orthologs_homeologs/orthogroups.03.06.2017/OG_trees.30.05.2017.RData')
-length(trees) # total orthogroups
-# table(sapply(trees, function(i) sum(c('Ssal', 'Omyk') %in% substr(i$tip.label, 1, 4)))) ## ==> a way of summing up number of specific species in trees.
+# load orthotrees - this is the output from protein trees made 
+# from orthogroup sets of sequences (from orthofinder)
+OG_trees <- loadRData(paste('C:/Users/meeldurb/Google Drive/Master internship ',
+                    'phylogenetics salmonids/Salmonid_genomics_resources/',
+                    'Orthologs_homeologs/orthogroups.03.06.2017/',
+                    'OG_trees.30.05.2017.RData', sep = ''))
+
+length(OG_trees) # total orthogroups
+# table(sapply(OG_trees, function(i) sum(c('Ssal', 'Omyk') %in% substr(i$tip.label, 1, 4)))) ## ==> a way of summing up number of specific species in trees.
 
 # 2) make clans using clanfinder
-OG_clanfinder = lapply(trees, clanFinder, ut = c('Olat', 'Gacu', 'Drer', 'Locu', 'Mmus', 'Hsap'))
+OG_clanfinder = lapply(OG_trees, clanFinder, ut = c('Olat', 'Gacu', 'Drer', 'Locu', 'Mmus', 'Hsap'))
 
 # show melanie:
-names(trees)
+names(OG_trees)
 names(OG_clanfinder[[1]])
 
 # fix names
@@ -79,7 +83,7 @@ OG_clans = lapply(OG_clans, function(i){
 #Note - names of clans where the OG represented a single clans: .0
 
 # is there redundancy in OG_clans??
-orthogrtips = unlist(sapply(trees, function(i) i$tip.label))
+orthogrtips = unlist(sapply(OG_trees, function(i) i$tip.label))
 table(duplicated(orthogrtips))
 
 clantips = unlist(sapply(OG_clans, function(i) i$tip.label))
@@ -141,11 +145,11 @@ length(OG_clans[["OG0001162_1."]]$tip.label)
 length(OG_clans[["OG0001162_2."]]$tip.label)
 
 par(mfrow=c(3,1))
-plot(trees[["OG0001162."]])
+plot(OG_trees[["OG0001162."]])
 plot(OG_clans[["OG0001162_1."]])
 plot(OG_clans[["OG0001162_2."]])
 
-length(trees[["OG0001162."]]$tip.label)
+length(OG_trees[["OG0001162."]]$tip.label)
 length(OG_clans[["OG0001162_1."]]$tip.label)
 length(OG_clans[["OG0001162_2."]]$tip.label)
 
