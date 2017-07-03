@@ -1,13 +1,24 @@
-# Getting orthogroup data for xml prep.
+#!usr/bin/env Rscript
+
+###################################################################
+##Author: Melanie van den Bosch
+##Script for loading and manipulating the orthoclan information
+###################################################################
+
 
 #------------------------------------------#
-##____ libraries, functions, and data ____##
+##_____ load libraries and functions _____##
 #------------------------------------------#
 
+install.packages('RCurl',  repos = "http://cran.rstudio.com/")
+#install.packages("ape", repos = "http://cran.rstudio.com/")
+#install.packages("phangorn", repos = "http://cran.rstudio.com/")
+
+library(RCurl)
 library(ape)
 library(phangorn)
 
-#install.packages('RCurl')
+
 
 # source_github <- function(u) {
 #   # load package
