@@ -203,7 +203,7 @@ length(OG_clans[["OG0001162_2."]]$tip.label)
 
 
 ##---------------------------##
-#_______ write out data ______#
+#_____ Find proper trees _____#
 ##---------------------------##
 
 # make a dataframe of all the alignments with the names
@@ -238,7 +238,7 @@ table(idx.toanalyze)
 # only select the OG clans which have at least 7 tips that are also
 # contained in the alignments dataframe
 OG_clans_filt_2analyze = OG_clans_filt[idx.toanalyze]
-
+length(OG_clans_filt_2analyze)
 
 save(OG_clans_filt_2analyze, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
                      '/Beast_dating_salmonids/RData/',
@@ -248,7 +248,7 @@ save(OG_clans_filt_2analyze, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
 
 ##---------------------------##
 #____ check for duplicates ___#
-##---------------------------##\
+##---------------------------##
 
 
 # use dup tables below and check that clans contain at least one dup pair of one of the species...
@@ -270,4 +270,24 @@ Ssal.dup <- loadRData(paste('C:/Users/meeldurb/Google Drive/',
                             'in_homelogRegions_minpident80_mincov50_',
                             'phylofiltered.RData', sep = ''))[,1:2]
 
+# merge all these duplicates in one character vector
+dup.pairs <- c(Omyk.dup$qseqid, Omyk.dup$sseqid, Ssal.dup$qseqid, Ssal.dup$sseqid)
 
+# check 
+idx.dup = c()
+for(i in 1:length(OG_clans_filt_2analyze)){
+  idx.dup[i] <- sum(!is.na(match(substr(OG_clans_filt_2analyze[[i]]$tip.label,
+                                            6, 100), dup.pairs)))>=1
+}
+table(idx.dup)
+
+
+OG_clans_dupl = OG_clans_filt_2analyze[idx.dup]
+##---------------------------##
+#______ Write out data _______#
+##---------------------------##
+
+
+save(OG_clans_dupl, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
+                                          '/Beast_dating_salmonids/RData/',
+                                          'Clans_2analyze_inBeast_withduplicates.RData', sep = ''))
