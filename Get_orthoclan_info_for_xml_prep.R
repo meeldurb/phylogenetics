@@ -13,11 +13,13 @@
 #install.packages('RCurl',  repos = "http://cran.rstudio.com/")
 #install.packages("ape", repos = "http://cran.rstudio.com/")
 #install.packages("phangorn", repos = "http://cran.rstudio.com/")
+#install.packages("plyr", repos = "http://cran.rstudio.com/")
 
 library(RCurl)
 library(ape)
 library(phangorn)
 library(seqinr)
+library(plyr)
 
 
 
@@ -142,7 +144,7 @@ OG_clans_filt = OG_clans[keep.names]
 length(OG_clans_filt)
 
 ##---------------------------##
-#_______ write out data ______#
+#________ filter data ________#
 ##---------------------------##
 
 #save(OG_clans_filt, file = '~/Dropbox/Work/PhDs_and_Master/ERASMUS/Melanie/Beast_dating_salmonids/RData/Ortho_clans_filtered.RData')
@@ -159,18 +161,27 @@ fasta.files <- paste('C:/Users/meeldurb/Google Drive/',
                      'Salmonid_genomics_resources/Orthologs_homeologs/',
                      'orthogroups.03.06.2017/cds_pal2nal/', sep = '')
 
+# read the alignments in memory
 alignments = lapply(dir(fasta.files, full.names = T), function(i){
   t = try(read.fasta(i), silent = T)
   if(class(t)=='try-error') return(NULL)
   if(class(t)!='try-error') return(t)
   }
 )
+
+
+# change names of the alignments. Remove .fa
 names(alignments) <- sub('fa', '', dir(fasta.files))
+
+# extract the duplicated alignments
 table(duplicated(sub('fa', '', dir(fasta.files))))
 
+# how much of the alignments are empty
 table(sapply(alignments, is.null))[1]/sum(table(sapply(alignments, is.null)))
 
+# filter out the empty alignments
 alignments_filtered = alignments[!sapply(alignments, is.null)]
+length(alignments)
 length(alignments_filtered)
 names(alignments_filtered)
 
@@ -178,39 +189,85 @@ length(alignments_filtered[["OG0001162."]])
 length(OG_clans[["OG0001162_1."]]$tip.label)
 length(OG_clans[["OG0001162_2."]]$tip.label)
 
+# check out some of the trees
 par(mfrow=c(3,1))
 plot(OG_trees[["OG0001162."]])
 plot(OG_clans[["OG0001162_1."]])
 plot(OG_clans[["OG0001162_2."]])
 
+# not the whole tree is splitted up in clans, the mammal outgroup is removed
 length(OG_trees[["OG0001162."]]$tip.label)
 length(OG_clans[["OG0001162_1."]]$tip.label)
 length(OG_clans[["OG0001162_2."]]$tip.label)
 
 
 
-##:
-library(plyr)
-alignments.df = ldply(alignments_filtered,function(i) data.frame(tips=names(i), seqs=as.character(sapply(i, paste, collapse='')), stringsAsFactors = F))
+##---------------------------##
+#_______ write out data ______#
+##---------------------------##
+
+# make a dataframe of all the alignments with the names
+alignments.df = ldply(alignments_filtered, function(i) {
+  data.frame(tips=names(i), seqs=as.character(sapply(i, paste, collapse='')
+                                              ), stringsAsFactors = F)
+  })
+
+# removing the double organism name
 alignments.df$tips <- substr(alignments.df$tips, 6, 100)
 
-save(alignments.df, file = '~/Dropbox/Work/PhDs_and_Master/ERASMUS/Melanie/Beast_dating_salmonids/RData/Clan_alignments_df.RData')
+
+# save(alignments.df, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
+#                                 '/Beast_dating_salmonids/RData/',
+#                                 'Clan_alignments_df.RData', sep = ''))
+
+alignments.df <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
+                     '/Beast_dating_salmonids/RData/',
+                     'Clan_alignments_df.RData', sep = ''))
+
 head(alignments.df)
 dim(alignments.df)
 
+# find which OG clans have at least 7 tips in the alignment dataframe
 idx.toanalyze = c()
 for(i in 1:length(OG_clans_filt)){
-  idx.toanalyze[i] <- sum(!is.na(match(OG_clans_filt[[i]]$tip.label, alignments.df$tips)))>7
+  idx.toanalyze[i] <- sum(!is.na(match(OG_clans_filt[[i]]$tip.label, 
+                                       alignments.df$tips)))>7
 }
 table(idx.toanalyze)
 
+# only select the OG clans which have at least 7 tips that are also
+# contained in the alignments dataframe
 OG_clans_filt_2analyze = OG_clans_filt[idx.toanalyze]
-save(OG_clans_filt_2analyze, file = '~/Dropbox/Work/PhDs_and_Master/ERASMUS/Melanie/Beast_dating_salmonids/RData/Clans_2analyze_inBeast.RData')
+
+
+save(OG_clans_filt_2analyze, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
+                     '/Beast_dating_salmonids/RData/',
+                    'Clans_2analyze_inBeast.RData', sep = ''))
+
+
+
+##---------------------------##
+#____ check for duplicates ___#
+##---------------------------##\
+
 
 # use dup tables below and check that clans contain at least one dup pair of one of the species...
 #/Users/srsand/Google\ Drive/Salmonid_genomics_resources/Orthologs_homeologs/Homeologs/OmykV6_2016_best_in_homelogRegions_minpident80_mincov50_phylofiltered.RData
 #/Users/srsand/Google\ Drive/Salmonid_genomics_resources/Orthologs_homeologs/Homeologs/RefSeq_GarethLongest_2016_best_in_homelogRegions_minpident80_mincov50_phylofiltered.RData 
 
 
+# check if OG clans contain duplicated pair of Omyk and Ssal
+Omyk.dup <- loadRData(paste('C:/Users/meeldurb/Google Drive/',
+                            'Master internship phylogenetics salmonids/',
+                            'Salmonid_genomics_resources/Orthologs_homeologs/',
+                            'Homeologs/OmykV6_2016_best_in_homelogRegions_',
+                            'minpident80_mincov50_phylofiltered.RData', sep = ''))[,1:2]
+
+Ssal.dup <- loadRData(paste('C:/Users/meeldurb/Google Drive/',
+                            'Master internship phylogenetics salmonids/',
+                            'Salmonid_genomics_resources/Orthologs_homeologs/',
+                            'Homeologs/RefSeq_GarethLongest_2016_best_',
+                            'in_homelogRegions_minpident80_mincov50_',
+                            'phylofiltered.RData', sep = ''))[,1:2]
 
 
