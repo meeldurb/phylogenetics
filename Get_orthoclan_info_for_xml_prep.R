@@ -133,7 +133,8 @@ rownames(lookup) <- NULL
 head(lookup, 50)
 
 ## identify clans with same Omyk tipname and remove the suckers...
-clans_with_dupOmykGenes = unique(paste(lookup$clan[lookup$tip %in% lookup$tip[which(duplicated(lookup$tip))]], '.', sep=''))
+clans_with_dupOmykGenes = unique(paste(lookup$clan[lookup$tip %in% 
+                        lookup$tip[which(duplicated(lookup$tip))]], '.', sep=''))
 length(OG_clans)-length(clans_with_dupOmykGenes)
 keep.names= names(OG_clans)[!names(OG_clans) %in% clans_with_dupOmykGenes]
 length(keep.names)
@@ -141,25 +142,35 @@ OG_clans_filt = OG_clans[keep.names]
 length(OG_clans_filt)
 
 ##---------------------------##
-#   write out data to MelB    #
+#_______ write out data ______#
 ##---------------------------##
 
-save(OG_clans_filt, file = '~/Dropbox/Work/PhDs_and_Master/ERASMUS/Melanie/Beast_dating_salmonids/RData/Ortho_clans_filtered.RData')
+#save(OG_clans_filt, file = '~/Dropbox/Work/PhDs_and_Master/ERASMUS/Melanie/Beast_dating_salmonids/RData/Ortho_clans_filtered.RData')
+
+OG_clans_filt <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
+                           'Beast_dating_salmonids/RData/',
+                           'Ortho_clans_filtered.RData',
+                           sep = ''))
 
 
+# load location of fasta files
+fasta.files <- paste('C:/Users/meeldurb/Google Drive/',
+                     'Master internship phylogenetics salmonids/',
+                     'Salmonid_genomics_resources/Orthologs_homeologs/',
+                     'orthogroups.03.06.2017/cds_pal2nal/', sep = '')
 
-library(seqinr)
-alignemtns = lapply(dir('~/Google Drive/Salmonid_genomics_resources/Orthologs_homeologs/orthogroups.03.06.2017/cds_pal2nal/', full.names = T), function(i){
+alignments = lapply(dir(fasta.files, full.names = T), function(i){
   t = try(read.fasta(i), silent = T)
   if(class(t)=='try-error') return(NULL)
   if(class(t)!='try-error') return(t)
   }
 )
-names(alignemtns) <- sub('fa', '', dir('~/Google Drive/Salmonid_genomics_resources/Orthologs_homeologs/orthogroups.03.06.2017/cds_pal2nal/'))
-table(duplicated(sub('fa', '', dir('~/Google Drive/Salmonid_genomics_resources/Orthologs_homeologs/orthogroups.03.06.2017/cds_pal2nal/'))))
-table(sapply(alignemtns, is.null))[1]/sum(table(sapply(alignemtns, is.null)))
+names(alignments) <- sub('fa', '', dir(fasta.files))
+table(duplicated(sub('fa', '', dir(fasta.files))))
 
-alignments_filtered = alignemtns[!sapply(alignemtns, is.null)]
+table(sapply(alignments, is.null))[1]/sum(table(sapply(alignments, is.null)))
+
+alignments_filtered = alignments[!sapply(alignments, is.null)]
 length(alignments_filtered)
 names(alignments_filtered)
 
