@@ -2,7 +2,8 @@
 
 ###################################################################
 ##Author: Melanie van den Bosch & Simen Rod Sandve
-##Script for loading and manipulating the orthoclan information
+##Script for loading and manipulating the orthoclan results
+##and preparing them to be imported in the BEAUTI .xml files
 ###################################################################
 
 
@@ -29,12 +30,11 @@ source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
 source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
              'Master_internship_phylogenetics/',
              'Phylogenomics/Phylo_functions.R', sep = ''))
+source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
+             'Master_internship_phylogenetics/',
+             'Phylogenetics/loadRData.R', sep = ''))
 
-loadRData <- function(fileName){
-  #loads an RData file, and returns it
-  load(fileName)
-  get(ls()[ls() != "fileName"])
-}
+
 
 #-------------------------------------------------#
 ##____ make initial clans from protein trees ____##
