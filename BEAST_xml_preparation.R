@@ -7,9 +7,9 @@
 
 
 
-
-
-#####___________install & load packages and functions____________####
+#------------------------------------------#
+##_____ load libraries and functions _____##
+#------------------------------------------#
 
 install.packages("ape", repos = "http://cran.rstudio.com/")
 install.packages("phangorn", repos = "http://cran.rstudio.com/")
@@ -25,57 +25,55 @@ source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
              'Master_internship_phylogenetics/phylogenomics/',
              'auto.root_salmonid_clans.R', sep = "" ))
 
-#source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
-             'Master_internship_phylogenetics/phylogenetics/',
-             'orthologfinder_MvdB.R', sep = ""))
+# source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
+#              'Master_internship_phylogenetics/phylogenetics/',
+#              'orthologfinder_MvdB.R', sep = ""))
+
+source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
+             'Master_internship_phylogenetics/',
+             'Phylogenetics/loadRData.R', sep = ''))
 
 
-#C:\Users\meeldurb\Dropbox\Melanie\Master_internship_phylogenetics\phylogenetics
-####____________load data______________####
 
+#-----------------------#
+##_____ Load data _____##
+#-----------------------#
 
-save(OG_clans_dupl, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
+# get clans
+OG_clans_dupl <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
                                  '/Beast_dating_salmonids/RData/',
                                  'Clans_2analyze_inBeast_withduplicates.RData', sep = ''))
 
 
-# prepare homeolog table
+# prepare duplicated pairs table
 
-# get homologs of Oncorhynchus mykiss (rainbow trout)
-load(file.path("C:/Users/meeldurb/Google Drive",
-               "Master internship phylogenetics salmonids",
-               "Salmonid_genomics_resources/Orthologs_homeologs/Homeologs",
-               "OmykV6_2016_best_in_homelogRegions_minpident80_mincov50.RData"))
-     
-# change to use env here because of same file names 
-# only select first 2 columns, these contain the homologues
-omyk.hom <- putative_homeologs_pepblast[,1:2] 
-# add organism naming in front on homologues genes
-omyk.hom = apply(omyk.hom, 2, function(i) paste('Omyk2|', i, sep=''))
+# get duplicate pairs of Oncorhynchus mykiss (rainbow trout)
+Omyk.duplicates <- loadRData(paste('C:/Users/meeldurb/Google Drive/',
+                            'Master internship phylogenetics salmonids/',
+                            'Salmonid_genomics_resources/Orthologs_homeologs/',
+                            'Homeologs/OmykV6_2016_best_in_homelogRegions_',
+                            'minpident80_mincov50_phylofiltered.RData', sep = ''))[,1:2]
+  
 
-# get homologs of Salmo salar (Atlantic salmon)
-load(file.path("C:/Users/meeldurb/Google Drive", 
-               "Master internship phylogenetics salmonids", 
-               "Salmonid_genomics_resources/Orthologs_homeologs/Homeologs",
-               "RefSeq_GarethLongest_2016_best_in_homelogRegions_minpident80_mincov50.RData"))
-# change to use env here because of same file names 
-ssal.hom <- putative_homeologs_pepblast[,1:2]
-# add organism naming in front on homologues genes
-ssal.hom <- apply(ssal.hom, 2, function(i) paste('Ssal|', i, sep=''))
+# get duplicat pairs of Salmo salar (Atlantic salmon)
+Ssal.duplicates <- loadRData(paste('C:/Users/meeldurb/Google Drive/',
+                            'Master internship phylogenetics salmonids/',
+                            'Salmonid_genomics_resources/Orthologs_homeologs/',
+                            'Homeologs/RefSeq_GarethLongest_2016_best_',
+                            'in_homelogRegions_minpident80_mincov50_',
+                            'phylofiltered.RData', sep = ''))[,1:2]
+
+# add organism naming in front on duplicate pairs
+omyk.dup <- apply(Omyk.duplicates, 2, function(i) paste('Omyk2|', i, sep=''))
+ssal.dup <- apply(Ssal.duplicates, 2, function(i) paste('Ssal|', i, sep=''))
 
 # bind all homologs in complete dataframe
-hom.table <- data.frame(rbind(omyk.hom, ssal.hom), 
+dup.table <- data.frame(rbind(omyk.dup, ssal.dup), 
                         stringsAsFactors = F)
-head(hom.table)
 
 
-# get clans
-load(file.path("C:/Users/meeldurb/Google Drive",
-"Master internship phylogenetics salmonids",
-"Salmonid_genomics_resources/Orthologs_homeologs",
-"Gene_trees/OMYK_Orthofinder_trees_October2016_clanfinder_clans.RData"))
 
-clans <- Orthofinder_trees_October2016_clanfinder_clans
+
 # add a dot behind the gene names to make it suited for unlisting
 # names(clans) <- paste(names(clans), '.', sep='')
 # Some labels of the genes need re-labelling
