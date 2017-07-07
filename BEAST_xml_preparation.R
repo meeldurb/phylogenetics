@@ -22,16 +22,22 @@ library("plyr")
 require("seqinr")
 
 source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
-             'Master_internship_phylogenetics/phylogenetics/',
-             'auto.root_salmonid_clans_MvdB.R', sep = "" ))
+             'Master_internship_phylogenetics/phylogenomics/',
+             'auto.root_salmonid_clans.R', sep = "" ))
 
-source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
+#source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
              'Master_internship_phylogenetics/phylogenetics/',
              'orthologfinder_MvdB.R', sep = ""))
 
 
 #C:\Users\meeldurb\Dropbox\Melanie\Master_internship_phylogenetics\phylogenetics
 ####____________load data______________####
+
+
+save(OG_clans_dupl, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
+                                 '/Beast_dating_salmonids/RData/',
+                                 'Clans_2analyze_inBeast_withduplicates.RData', sep = ''))
+
 
 # prepare homeolog table
 
