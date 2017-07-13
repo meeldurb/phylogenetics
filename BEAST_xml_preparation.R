@@ -25,9 +25,13 @@ source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
              'Master_internship_phylogenetics/phylogenomics/',
              'auto.root_salmonid_clans.R', sep = "" ))
 
-# source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
-#              'Master_internship_phylogenetics/phylogenetics/',
-#              'orthologfinder_MvdB.R', sep = ""))
+source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
+             'Master_internship_phylogenetics/phylogenetics/',
+             'auto.root_salmonid_clans_MvdB.R', sep = "" ))
+
+source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
+             'Master_internship_phylogenetics/phylogenetics/',
+              'orthologfinder_MvdB.R', sep = ""))
 
 source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
              'Master_internship_phylogenetics/',
@@ -55,7 +59,7 @@ Omyk.duplicates <- loadRData(paste('C:/Users/meeldurb/Google Drive/',
                             'minpident80_mincov50_phylofiltered.RData', sep = ''))[,1:2]
   
 
-# get duplicat pairs of Salmo salar (Atlantic salmon)
+# get duplicate pairs of Salmo salar (Atlantic salmon)
 Ssal.duplicates <- loadRData(paste('C:/Users/meeldurb/Google Drive/',
                             'Master internship phylogenetics salmonids/',
                             'Salmonid_genomics_resources/Orthologs_homeologs/',
@@ -72,48 +76,41 @@ dup.table <- data.frame(rbind(omyk.dup, ssal.dup),
                         stringsAsFactors = F)
 
 
-
-
-# add a dot behind the gene names to make it suited for unlisting
-# names(clans) <- paste(names(clans), '.', sep='')
-# Some labels of the genes need re-labelling
-# Tthy needs to have a | behind and 
-clans <- lapply(clans, function(i) {
-  tip.lab <- gsub('Tthy', 'Tthy|Tthy', i$tip.label)
-  i$tip.label <- tip.lab
-  i
-  })
-
 ####________ Example tree _______######
-# select only the clans tht have at least 1 E.luc 
-# and select only the clans that have 
-# at least 2 of the Ssal, Omyk or Tthy species.
-clans.selection = clans[sapply(clans, function(i) {
-   length(grep('Eluc', i$tip.label))>0 & 
+# select only the OG groups with clans that have at least 1 E.luc 
+# and at least 2 of the Ssal, Omyk or Tthy species.
+# else no proper tree can be drawn
+clans.selection <- OG_clans_dupl[sapply(OG_clans_dupl, function(i) {
+  length(grep('Eluc', i$tip.label))>0 & 
     length(grep('Ssal|Omyk|Tthy', i$tip.label))>=2
   })]
+
 length(clans.selection)
-plot(auto.root(clans.selection[[1000]])$rooted.clan)
+plot(auto.root(clans.selection[[5]])$rooted.clan)
 
 # get orthologs of all the clans
 test.all <- lapply(clans.selection, get.ortholog, verbouse=F)
 table(sapply(test.all, function(i) i$class))
-test.og <- get.ortholog(clans.selection[[1000]])
-tree <- clans.selection[[1000]]
-plot(tree)
+test.og <- get.ortholog(clans.selection[[5]])
 
+tree <- clans.selection[[5]]
+plot(tree)
+nodelabels()
+tiplabels()
 
 #####________Make BEAST files________#####
 
+# for 1 file 
 # get alignment file path
-alis <- file.path('C:/Users/meeldurb/Documents/WUR/Master',
-                  '/Internship/Beast_dating_salmonids/',
-                  'OG0000115_2_aln.fa')
+alignment <- read.fasta(paste('C:/Users/meeldurb/Google Drive/',
+                       'Master internship phylogenetics salmonids/',
+                       'Salmonid_genomics_resources/Orthologs_homeologs/',
+                       'orthogroups.03.06.2017/cds_pal2nal/OG0002307.fa', sep = ''))
 
-# get preparation xml file
-xml <- readLines(file.path('C:/Users/meeldurb/Dropbox/Melanie/',
-                           'Beast_dating_salmonids/Dummy_beast_input/',
-                           'test_beauti.xml'))
+# get xml file we need to import the alingment in
+xml <- readLines(paste('C:/Users/meeldurb/Dropbox/Melanie/',
+                       'Master_internship_phylogenetics/', 
+                       'phylogenetics/dummy_xml/secondary_constr.xml', sep = ''))
 
 
 # get the orthologs
