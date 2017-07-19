@@ -43,7 +43,7 @@ source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
 ##_____ Load data _____##
 #-----------------------#
 
-# get clans
+# get clans to obtain the clan structure of the trees
 OG_clans_dupl <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
                                  '/Beast_dating_salmonids/RData/',
                                  'Clans_2analyze_inBeast_withduplicates.RData', sep = ''))
@@ -76,7 +76,12 @@ dup.table <- data.frame(rbind(omyk.dup, ssal.dup),
                         stringsAsFactors = F)
 
 
-####________ Example tree _______######
+
+
+#--------------------------#
+##_____ Example tree _____##
+#--------------------------#
+
 # select only the OG groups with clans that have at least 1 E.luc 
 # and at least 2 of the Ssal, Omyk or Tthy species.
 # else no proper tree can be drawn
@@ -98,14 +103,19 @@ plot(tree)
 nodelabels()
 tiplabels()
 
-#####________Make BEAST files________#####
 
-# for 1 file 
-# get alignment file path
-alignment <- read.fasta(paste('C:/Users/meeldurb/Google Drive/',
+#------------------------------#
+##_____ Make BEAST files _____##
+#------------------------------#
+
+
+# get file path with all alignments
+alignment.files <- dir(paste('C:/Users/meeldurb/Google Drive/',
                        'Master internship phylogenetics salmonids/',
                        'Salmonid_genomics_resources/Orthologs_homeologs/',
-                       'orthogroups.03.06.2017/cds_pal2nal/OG0002307.fa', sep = ''))
+                       'orthogroups.03.06.2017/cds_pal2nal/', sep = ''), 
+                       full.names = T)
+
 
 # get xml file we need to import the alingment in
 xml <- readLines(paste('C:/Users/meeldurb/Dropbox/Melanie/',
@@ -113,33 +123,36 @@ xml <- readLines(paste('C:/Users/meeldurb/Dropbox/Melanie/',
                        'phylogenetics/dummy_xml/secondary_constr.xml', sep = ''))
 
 
-# get the orthologs
-load(file.path('C:/Users/meeldurb/Dropbox/Melanie/',
-               'Beast_dating_salmonids/',
-               'orthologs_list_20161115.RData'))
+# claninformation is contained in  OG_clans_dupl
 
+count <- 0
 
-count = 0
-
-for(i in alis){
+for(ali in alignment.files){
+  cat(ali, '\n')
+  cat(count <- count + 1, '\n')
   
-  #i = alis # make the xml for single alignment/OG
+  if (grepl('.fa', ali)){ 
+    if (!file.size(ali) == 0){
+  # read all alignments files as fasta, but as one whole string
+  ali.fasta <- read.fasta(ali)
+    
   
-  count <- count+1 # check for loop
-  temp <- xml
-  # read all alingments files as fasta, but as one whole string
-  d <- read.fasta(i, as.string=T)
+  } else{
+      print ("file is empty")
+    }
+  }
+} 
   
   # get ortholog info ready:
   # IMPORTANT: alignments must have the name: clan_aln.fa for this to work
   # remove the _aln.fa name of the file
-  clan = paste(sub('_aln.fa', '', basename(i)), '.', sep='') 
+  clan = paste(sub('.fa', '', basename(ali)), '.', sep='') 
 
   # the orthologs.list has a "."
   #at the end of every OG (ortholog group) ID
   # we need to select this OG ID coming from
   # the alignment filename in this ortholog.list
-  clan.info  = orthologs.list[[clan]]
+  clan.info  = orthologs[[clan]]
   
   # we can plot the tree from this OG ID
   plot(clan.info$clan.tree)
