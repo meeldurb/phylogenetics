@@ -260,27 +260,58 @@ OG_clans_filt_2analyze <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
 
 
 # check if OG clans contain duplicated pair of Omyk and Ssal
-Omyk.dup <- loadRData(paste('C:/Users/meeldurb/Google Drive/',
+Omyk.duplicates <- loadRData(paste('C:/Users/meeldurb/Google Drive/',
                             'Master internship phylogenetics salmonids/',
                             'Salmonid_genomics_resources/Orthologs_homeologs/',
                             'Homeologs/OmykV6_2016_best_in_homelogRegions_',
                             'minpident80_mincov50_phylofiltered.RData', sep = ''))[,1:2]
 
-Ssal.dup <- loadRData(paste('C:/Users/meeldurb/Google Drive/',
+Ssal.duplicates <- loadRData(paste('C:/Users/meeldurb/Google Drive/',
                             'Master internship phylogenetics salmonids/',
                             'Salmonid_genomics_resources/Orthologs_homeologs/',
                             'Homeologs/RefSeq_GarethLongest_2016_best_',
                             'in_homelogRegions_minpident80_mincov50_',
                             'phylofiltered.RData', sep = ''))[,1:2]
 
-# merge all these duplicates in one character vector
-dup.pairs <- c(Omyk.dup$qseqid, Omyk.dup$sseqid, Ssal.dup$qseqid, Ssal.dup$sseqid)
+# add organism naming in front on duplicate pairs
+Omyk.dup <- apply(Omyk.duplicates, 2, function(i) paste('Omyk|', i, sep=''))
+Ssal.dup <- apply(Ssal.duplicates, 2, function(i) paste('Ssal|', i, sep=''))
 
-# check 
+# bind all duplicate pairs in complete dataframe
+dup.table <- data.frame(rbind(Omyk.dup, Ssal.dup), 
+                        stringsAsFactors = F)
+
+
+# check if there is at least 1 duplicate pair
+length(OG_clans_filt_2analyze)
+
+# find how many have at least 2 of Ssal or Omyk genes 
+# this should resemble the duplicate check
+table(sapply(OG_clans_filt_2analyze, function(i) {
+  length(which(substr(i$tip.label, 1,4) == "Ssal")) >= 2 |
+    length(which(substr(i$tip.label, 1,4) == "Omyk")) >= 2 }))
+
+
+
+# for each row in the dup.table we want to check whether
+# they are contained in the tip.label
+
+for (idx in 1:length(OG_clans_filt_2analyze)){
+  print("tips")
+  idx.dup[idx] <- !is.na(match(OG_clans_filt_2analyze[[idx]]$tip.label, dup.table[,1])) && 
+                        match(OG_clans_filt_2analyze[[idx]]$tip.label, 
+                                                       dup.table[,2]))
+}
+
+
+
+dup.pairs <- c(Omyk.dup[,1], Omyk.dup[,2], Ssal.dup[,1], Ssal.dup[,2])
+
+
 idx.dup = c()
 for(i in 1:length(OG_clans_filt_2analyze)){
-  idx.dup[i] <- sum(!is.na(match(substr(OG_clans_filt_2analyze[[i]]$tip.label,
-                                            6, 100), dup.pairs)))>=1
+  idx.dup[i] <- sum(!is.na(match(OG_clans_filt_2analyze[[1000]]$tip.label,
+                                 dup.pairs)))>=1
 }
 table(idx.dup)
 
@@ -291,7 +322,7 @@ OG_clans_dupl = OG_clans_filt_2analyze[idx.dup]
 ##---------------------------##
 
 
-save(OG_clans_dupl, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
+#save(OG_clans_dupl, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
                                   '/Beast_dating_salmonids/RData/',
                                   'Clans_2analyze_inBeast_withduplicates_aa.RData', 
                                   sep = ''))
