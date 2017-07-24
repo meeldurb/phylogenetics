@@ -1,4 +1,4 @@
-#!usr/bin/env Rscript
+Ma#!usr/bin/env Rscript
 
 ###################################################################
 ##Author: Melanie van den Bosch
@@ -46,7 +46,7 @@ source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
 # get clans to obtain the clan structure of the trees
 OG_clans_dupl <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
                                  '/Beast_dating_salmonids/RData/',
-                                 'Clans_2analyze_inBeast_withduplicates.RData', sep = ''))
+                                 'Clans_2analyze_inBeast_withduplicates_aa.RData', sep = ''))
 
 
 # prepare duplicated pairs table
@@ -91,14 +91,15 @@ clans.selection <- OG_clans_dupl[sapply(OG_clans_dupl, function(i) {
   })]
 
 length(clans.selection)
-plot(auto.root(clans.selection[[5]])$rooted.clan)
+par(mfrow = c(1,1))
+plot(auto.root(clans.selection[[150]])$rooted.clan)
 
 # get orthologs of all the clans
 test.all <- lapply(clans.selection, get.ortholog, verbouse=F)
 table(sapply(test.all, function(i) i$class))
-test.og <- get.ortholog(clans.selection[[5]])
+test.og <- get.ortholog(clans.selection[[150]])
 
-tree <- clans.selection[[5]]
+tree <- clans.selection[[150]]
 plot(tree)
 nodelabels()
 tiplabels()
@@ -122,6 +123,10 @@ xml <- readLines(paste('C:/Users/meeldurb/Dropbox/Melanie/',
                        'Master_internship_phylogenetics/', 
                        'phylogenetics/dummy_xml/secondary_constr.xml', sep = ''))
 
+
+orthologs.list <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
+                                 'Beast_dating_salmonids/orthologs_list_20161115.RData',
+                                 sep = ''))
 
 # claninformation is contained in  OG_clans_dupl
 
@@ -152,10 +157,12 @@ for(ali in alignment.files){
   #at the end of every OG (ortholog group) ID
   # we need to select this OG ID coming from
   # the alignment filename in this ortholog.list
-  clan.info  = orthologs[[clan]]
+  # I AM NOT SURE WHY WE WOULD USE THIS ORTHOLOGS LIST
+  #clan.info  = orthologs.list[[clan]]
   
+  clan.info = OG_clans_dupl[[clan]]
   # we can plot the tree from this OG ID
-  plot(clan.info$clan.tree)
+  plot(clan)
   
   # get the monophyletic groups or orthogroups from the 
   # clans that were taken from the orthologs.list
