@@ -60,7 +60,7 @@ OG_clanfinder = lapply(OG_trees, clanFinder, ut = c('Olat', 'Gacu', 'Drer', 'Loc
 
 # Play a bit with the datastructure
 names(OG_trees)
-# the names of the trees in the different OG groups are named by a integer
+# the names of the trees in the different clans in the OG groups are named by a integer
 names(OG_clanfinder)
 names(OG_clanfinder[1])
 names(OG_clanfinder[[1]])
@@ -78,6 +78,7 @@ length(OG_clanfinder.filt)
 clans.num <- as.numeric(unlist(sapply(OG_clanfinder.filt, function(i) 1:length(i))))
 OG_clans <- unlist(OG_clanfinder.filt, recursive = F)
 head(names(OG_clans))
+# get rid of the 2 dots and make an recursive integer for the clans of the OG's 
 names(OG_clans) <- paste(substr(names(OG_clans), 1, 9), paste(clans.num, '.', sep=''), sep='_')
 head(names(OG_clans))
 # total clans
@@ -159,7 +160,7 @@ OG_clans_filt <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
 fasta.files <- paste('C:/Users/meeldurb/Google Drive/',
                      'Master internship phylogenetics salmonids/',
                      'Salmonid_genomics_resources/Orthologs_homeologs/',
-                     'orthogroups.03.06.2017/cds_pal2nal/', sep = '')
+                     'orthogroups.03.06.2017/Alignments/', sep = '')
 
 # read the alignments in memory
 alignments = lapply(dir(fasta.files, full.names = T), function(i){
@@ -176,7 +177,7 @@ names(alignments) <- sub('fa', '', dir(fasta.files))
 # extract the duplicated alignments
 table(duplicated(sub('fa', '', dir(fasta.files))))
 
-# how much of the alignments are empty
+# how much of the alignments are not empty
 table(sapply(alignments, is.null))[1]/sum(table(sapply(alignments, is.null)))
 
 # filter out the empty alignments
@@ -185,15 +186,14 @@ length(alignments)
 length(alignments_filtered)
 names(alignments_filtered)
 
-length(alignments_filtered[["OG0001162."]])
-length(OG_clans[["OG0001162_1."]]$tip.label)
-length(OG_clans[["OG0001162_2."]]$tip.label)
+length(alignments_filtered$OG0018653.)
+length(OG_clans_filt$OG0018653.$tip.label)
 
 # check out some of the trees
 par(mfrow=c(3,1))
-plot(OG_trees[["OG0001162."]])
-plot(OG_clans[["OG0001162_1."]])
-plot(OG_clans[["OG0001162_2."]])
+plot(OG_trees[["OG0009052."]])
+plot(OG_clans_filt$OG0009052_1.)
+
 
 # not the whole tree is splitted up in clans, the mammal outgroup is removed
 length(OG_trees[["OG0001162."]]$tip.label)
@@ -217,12 +217,12 @@ alignments.df$tips <- substr(alignments.df$tips, 6, 100)
 
 
 # save(alignments.df, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
-#                                 '/Beast_dating_salmonids/RData/',
-#                                 'Clan_alignments_df.RData', sep = ''))
+#                                  '/Beast_dating_salmonids/RData/',
+#                                  'Clan_alignments_df_aa.RData', sep = ''))
 
 alignments.df <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
                      '/Beast_dating_salmonids/RData/',
-                     'Clan_alignments_df.RData', sep = ''))
+                     'Clan_alignments_df_aa.RData', sep = ''))
 
 head(alignments.df)
 dim(alignments.df)
@@ -242,7 +242,7 @@ length(OG_clans_filt_2analyze)
 
 save(OG_clans_filt_2analyze, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
                      '/Beast_dating_salmonids/RData/',
-                    'Clans_2analyze_inBeast.RData', sep = ''))
+                    'Clans_2analyze_inBeast_aa.RData', sep = ''))
 
 
 
@@ -252,7 +252,7 @@ save(OG_clans_filt_2analyze, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
 
 OG_clans_filt_2analyze <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
                                           '/Beast_dating_salmonids/RData/',
-                                          'Clans_2analyze_inBeast.RData', sep = ''))
+                                          'Clans_2analyze_inBeast_aa.RData', sep = ''))
 
 # use dup tables below and check that clans contain at least one dup pair of one of the species...
 #/Users/srsand/Google\ Drive/Salmonid_genomics_resources/Orthologs_homeologs/Homeologs/OmykV6_2016_best_in_homelogRegions_minpident80_mincov50_phylofiltered.RData
@@ -292,5 +292,10 @@ OG_clans_dupl = OG_clans_filt_2analyze[idx.dup]
 
 
 save(OG_clans_dupl, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
-                                          '/Beast_dating_salmonids/RData/',
-                                          'Clans_2analyze_inBeast_withduplicates.RData', sep = ''))
+                                  '/Beast_dating_salmonids/RData/',
+                                  'Clans_2analyze_inBeast_withduplicates_aa.RData', 
+                                  sep = ''))
+OG_clans_dupl <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
+                                 '/Beast_dating_salmonids/RData/',
+                                 'Clans_2analyze_inBeast_withduplicates_aa.RData', 
+                                 sep = ''))
