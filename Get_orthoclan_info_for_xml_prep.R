@@ -148,7 +148,10 @@ length(OG_clans_filt)
 #________ filter data ________#
 ##---------------------------##
 
-#save(OG_clans_filt, file = '~/Dropbox/Work/PhDs_and_Master/ERASMUS/Melanie/Beast_dating_salmonids/RData/Ortho_clans_filtered.RData')
+# save(OG_clans_filt, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
+#                                  'Beast_dating_salmonids/RData/',
+#                                  'Ortho_clans_filtered.RData',
+#                                  sep = ''))
 
 OG_clans_filt <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
                            'Beast_dating_salmonids/RData/',
@@ -292,20 +295,63 @@ table(sapply(OG_clans_filt_2analyze, function(i) {
 # they are contained in the tip.label
 idx.dup = 0
 for (idx in 1:length(OG_clans_filt_2analyze)){
-  cat(idx, "\n")
   idx.dup[idx] <- sum(sum(!is.na(match(OG_clans_filt_2analyze[[idx]]$tip.label, Omyk.dup[,1]))),  
-                        sum(!is.na(match(OG_clans_filt_2analyze[[idx]]$tip.label, 
-                                                       Omyk.dup[,2])))) == 2 |
+                      sum(!is.na(match(OG_clans_filt_2analyze[[idx]]$tip.label, 
+                                       Omyk.dup[,2])))) >= 2 |
     sum(sum(!is.na(match(OG_clans_filt_2analyze[[idx]]$tip.label, Ssal.dup[,1]))),  
         sum(!is.na(match(OG_clans_filt_2analyze[[idx]]$tip.label, 
-                         Ssal.dup[,2])))) == 2
+                         Ssal.dup[,2])))) >= 2
 }
 
 table(idx.dup)
-
+# keep the OG groups that were TRUE
+keep = which(idx.dup == 1)
 length(OG_clans_filt_2analyze)
-OG_clans_dupl = OG_clans_filt_2analyze[idx.dup]
+OG_clans_dupl = OG_clans_filt_2analyze[keep]
 length(OG_clans_dupl)
+
+
+##---------------------------------------------------##
+#______ Checking if duplicate check is correct _______#
+##---------------------------------------------------##
+
+# first Omyk
+idx.dup = 0
+for (idx in 1:length(OG_clans_filt_2analyze)){
+  idx.dup[idx] <- sum(sum(!is.na(match(OG_clans_filt_2analyze[[idx]]$tip.label, Omyk.dup[,1]))),  
+        sum(!is.na(match(OG_clans_filt_2analyze[[idx]]$tip.label, 
+                         Omyk.dup[,2])))) >= 2
+}
+
+table(idx.dup)
+# keep the OG groups that were TRUE
+keep = which(idx.dup == 1)
+length(OG_clans_filt_2analyze)
+OG_clans_dupl.omyk = OG_clans_filt_2analyze[keep]
+length(OG_clans_dupl.omyk)
+
+# then Ssal
+idx.dup = 0
+for (idx in 1:length(OG_clans_filt_2analyze)){
+  idx.dup[idx] <- sum(sum(!is.na(match(OG_clans_filt_2analyze[[idx]]$tip.label, Ssal.dup[,1]))),  
+                      sum(!is.na(match(OG_clans_filt_2analyze[[idx]]$tip.label, 
+                                       Ssal.dup[,2])))) >= 2
+}
+
+table(idx.dup)
+# keep the OG groups that were TRUE
+keep = which(idx.dup == 1)
+length(OG_clans_filt_2analyze)
+
+OG_clans_dupl.ssal = OG_clans_filt_2analyze[keep]
+length(OG_clans_dupl.ssal)
+
+
+
+
+fulldf.check <- unique(names(c(OG_clans_dupl.omyk, OG_clans_dupl.ssal)))
+length(fulldf.check)
+
 ##---------------------------##
 #______ Write out data _______#
 ##---------------------------##
@@ -317,5 +363,5 @@ save(OG_clans_dupl, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
                                   sep = ''))
 OG_clans_dupl <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
                                  '/Beast_dating_salmonids/RData/',
-                                 'Clans_2analyze_inBeast_withduplicates_aa.RData', 
+                                 'Clans_2analyze_inBeast_withduplicates.RData', 
                                  sep = ''))
