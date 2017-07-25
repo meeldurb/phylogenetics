@@ -274,16 +274,10 @@ Ssal.duplicates <- loadRData(paste('C:/Users/meeldurb/Google Drive/',
                             'phylofiltered.RData', sep = ''))[,1:2]
 
 # add organism naming in front on duplicate pairs
-Omyk.dup <- apply(Omyk.duplicates, 2, function(i) paste('Omyk|', i, sep=''))
-Ssal.dup <- apply(Ssal.duplicates, 2, function(i) paste('Ssal|', i, sep=''))
-
-# bind all duplicate pairs in complete dataframe
-dup.table <- data.frame(rbind(Omyk.dup, Ssal.dup), 
-                        stringsAsFactors = F)
+Omyk.dup <- as.data.frame(apply(Omyk.duplicates, 2, function(i) paste('Omyk|', i, sep='')))
+Ssal.dup <- as.data.frame(apply(Ssal.duplicates, 2, function(i) paste('Ssal|', i, sep='')))
 
 
-# check if there is at least 1 duplicate pair
-length(OG_clans_filt_2analyze)
 
 # find how many have at least 2 of Ssal or Omyk genes 
 # this should resemble the duplicate check
@@ -293,36 +287,31 @@ table(sapply(OG_clans_filt_2analyze, function(i) {
 
 
 
+# check if there is at least 1 duplicate pair
 # for each row in the dup.table we want to check whether
 # they are contained in the tip.label
-
+idx.dup = 0
 for (idx in 1:length(OG_clans_filt_2analyze)){
-  print("tips")
-  idx.dup[idx] <- !is.na(match(OG_clans_filt_2analyze[[idx]]$tip.label, dup.table[,1])) && 
-                        match(OG_clans_filt_2analyze[[idx]]$tip.label, 
-                                                       dup.table[,2]))
+  cat(idx, "\n")
+  idx.dup[idx] <- sum(sum(!is.na(match(OG_clans_filt_2analyze[[idx]]$tip.label, Omyk.dup[,1]))),  
+                        sum(!is.na(match(OG_clans_filt_2analyze[[idx]]$tip.label, 
+                                                       Omyk.dup[,2])))) == 2 |
+    sum(sum(!is.na(match(OG_clans_filt_2analyze[[idx]]$tip.label, Ssal.dup[,1]))),  
+        sum(!is.na(match(OG_clans_filt_2analyze[[idx]]$tip.label, 
+                         Ssal.dup[,2])))) == 2
 }
 
-
-
-dup.pairs <- c(Omyk.dup[,1], Omyk.dup[,2], Ssal.dup[,1], Ssal.dup[,2])
-
-
-idx.dup = c()
-for(i in 1:length(OG_clans_filt_2analyze)){
-  idx.dup[i] <- sum(!is.na(match(OG_clans_filt_2analyze[[1000]]$tip.label,
-                                 dup.pairs)))>=1
-}
 table(idx.dup)
 
-
+length(OG_clans_filt_2analyze)
 OG_clans_dupl = OG_clans_filt_2analyze[idx.dup]
+length(OG_clans_dupl)
 ##---------------------------##
 #______ Write out data _______#
 ##---------------------------##
 
 
-#save(OG_clans_dupl, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
+save(OG_clans_dupl, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
                                   '/Beast_dating_salmonids/RData/',
                                   'Clans_2analyze_inBeast_withduplicates_aa.RData', 
                                   sep = ''))
