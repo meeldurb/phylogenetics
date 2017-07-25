@@ -114,40 +114,69 @@ tiplabels()
 alignment.files <- dir(paste('C:/Users/meeldurb/Google Drive/',
                        'Master internship phylogenetics salmonids/',
                        'Salmonid_genomics_resources/Orthologs_homeologs/',
-                       'orthogroups.03.06.2017/cds_pal2nal/', sep = ''), 
+                       'orthogroups.03.06.2017/Alignments/', sep = ''), 
                        full.names = T)
 
 
 # get xml file we need to import the alingment in
 xml <- readLines(paste('C:/Users/meeldurb/Dropbox/Melanie/',
                        'Master_internship_phylogenetics/', 
-                       'phylogenetics/dummy_xml/secondary_constr.xml', sep = ''))
+                       'phylogenetics/dummy_xml/secondary_constr_aa.xml', sep = ''))
 
 
-orthologs.list <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
-                                 'Beast_dating_salmonids/orthologs_list_20161115.RData',
-                                 sep = ''))
+# orthologs.list <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
+#                                  'Beast_dating_salmonids/orthologs_list_20161115.RData',
+#                                  sep = ''))
 
 # claninformation is contained in  OG_clans_dupl
 
+#------------------------------------------------------#
+##_____ Make BEAST files, example 1 OG alingment _____##
+#------------------------------------------------------#
+
+
+
+ali = paste("C:/Users/meeldurb/Google Drive/Master internship phylogenetics ",
+            "salmonids/Salmonid_genomics_resources/Orthologs_homeologs/",
+            "orthogroups.03.06.2017/Alignments/OG0008397.fa", sep = "")
 count <- 0
 
 for(ali in alignment.files){
   cat(ali, '\n')
   cat(count <- count + 1, '\n')
-  
+  # checking if file is .fa file and if not empty
   if (grepl('.fa', ali)){ 
     if (!file.size(ali) == 0){
-  # read all alignments files as fasta, but as one whole string
+  # read all alignments of the .fa file
   ali.fasta <- read.fasta(ali)
     
   
-  } else{
+  } else {
       print ("file is empty")
     }
   }
 } 
-  
+
+# import ID
+pat.id = ".*(OG\\d*).fa"
+OG.id <- sub(pattern = pat, "\\1", ali)
+
+pat.id.xml = "OG\\d*"
+id <- sub(pattern = pat.id.xml, replace = OG.id, x = xml[5])
+
+xml[5]
+# change datatype depending on nt/aa
+
+# import alignment
+
+# import the taxids
+
+# import monophyletic groups or priors
+
+# change the filenames
+
+
+
   # get ortholog info ready:
   # IMPORTANT: alignments must have the name: clan_aln.fa for this to work
   # remove the _aln.fa name of the file
