@@ -1,4 +1,4 @@
-Ma#!usr/bin/env Rscript
+#!usr/bin/env Rscript
 
 ###################################################################
 ##Author: Melanie van den Bosch
@@ -159,7 +159,7 @@ for(ali in alignment.files){
 
 # import ID
 pat.id = ".*(OG\\d*).fa"
-OG.id <- sub(pattern = pat, "\\1", ali)
+OG.id <- sub(pattern = pat.id, "\\1", ali)
 
 pat.id.xml = "OG\\d*"
 id <- sub(pattern = pat.id.xml, replace = OG.id, x = xml[5])
@@ -175,7 +175,10 @@ xml[5]
 
 # change the filenames
 
+## do it in python
 
+convertcmd <- paste("python transform_XML.py", ali, xml, OG)
+system(convertcmd)
 
   # get ortholog info ready:
   # IMPORTANT: alignments must have the name: clan_aln.fa for this to work
