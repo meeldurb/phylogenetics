@@ -36,6 +36,8 @@ def get_ali_filename(argv):
 
 def parse_into_xml(xml_filename, ali_filename):
     ID_pattern = re.compile(r'id="(OG\d+)"')
+    seq_pattern = re.compile(r'(\s+<sequence id="seq_)(.+)("\s+taxon=")(.+)' \
+                             '("\s* totalcount="\d+)(" value=")(.*)("\/>)')
     new_ID = get_ali_ID(ali_filename)
     with open(xml_filename, "rt") as xml_in:
         with open("xml_out.xml", "wt") as xml_out:
@@ -43,8 +45,23 @@ def parse_into_xml(xml_filename, ali_filename):
                 ID_match = ID_pattern.match(line)
                 if ID_match:
                     old_ID = ID_match.group(1)
-                    full_ID_new = 'id="' + new_ID + '\n'
+                    full_ID_new = 'id="' + new_ID + '"\n'
                     xml_out.write(old_ID.replace(old_ID, full_ID_new))
+                seq_match = seq_pattern.match(line)
+                if seq_match:
+                    s_beg = seq_match.group(1)
+                    s_name = seq_match.group(2)
+                    s_tax = seq_match.group(3)
+                    s_taxname = seq_match.group(4)
+                    s_count = seq_match.group(5)
+                    s_val = seq_match.group(6)
+                    s_ali = seq_match.group(7)
+                    s_end = seq_match.group(8)
+                    for ali_name, ali_seq in parse_alignment_info(ali_filename).iteritems():
+                        # take the 0th element of ali_name because it is contain
+                        full_seq_new = s_beg + ali_name + s_tax + ali_name + s_count + s_val + \
+                                       ali_seq + s_end + '\n'
+                    xml_out.write(s_beg.replace(s_beg, full_seq_new))
                 else:
                     xml_out.write(line)
                 
@@ -66,11 +83,11 @@ def parse_alignment_info(ali_filename):
                 name_match = name_pattern.match(line)
                 if name_match:
                     name = name_match.group(1)
-                    ali_dict[name] = []
+                    ali_dict[name] = ''
             else:
                 ali_dict[name] += line.strip()
             for key in ali_dict:
-                ali_dict[key] = ["".join(ali_dict[key])]
+                ali_dict[key] = "".join(ali_dict[key])
                 
         return ali_dict
 
