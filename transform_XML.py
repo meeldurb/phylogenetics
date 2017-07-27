@@ -55,10 +55,12 @@ def parse_into_xml(xml_filename, ali_filename):
                     s_ali = seq_match.group(7)
                     s_end = seq_match.group(8)
                     for ali_name, ali_seq in parse_alignment_info(ali_filename).iteritems():
-                        # take the 0th element of ali_name because it is contain
+                        # add the alignment lines into a variable
                         full_seq_new += s_beg + ali_name + s_tax + ali_name + s_count + s_val + \
                                         ali_seq + s_end + '\n'
-                xml_out.write(s_beg.replace(s_beg, full_seq_new))
+                        
+                    xml_out.write(s_beg.replace(s_beg, full_seq_new))
+                    full_seq_new = ''
                 
                 elif ID_match:
                     old_ID = ID_match.group(1)
