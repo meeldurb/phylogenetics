@@ -37,12 +37,12 @@ source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
 
 
 #-------------------------------------------------#
-##____ make initial clans from protein trees ____##
+##____ make clans from orthogroup trees ____##
 #-------------------------------------------------#
 
-# 1) get clans from orthogroups
+# 1) load orthotrees
 
-# load orthotrees - this is the output from protein trees made 
+# - this is the output from protein trees made 
 # from orthogroup sets of sequences (from orthofinder)
 OG_trees <- loadRData(paste('C:/Users/meeldurb/Google Drive/Master internship ',
                     'phylogenetics salmonids/Salmonid_genomics_resources/',
@@ -51,30 +51,26 @@ OG_trees <- loadRData(paste('C:/Users/meeldurb/Google Drive/Master internship ',
 
 # total number of orthogroups
 length(OG_trees) 
-# summing up number of specific species in trees.
+# summing up the number of specific species in the trees
 table(sapply(OG_trees, function(i) sum(c('Ssal', 'Omyk') %in% substr(i$tip.label, 1, 4))))
 
 # 2) make clans using clanfinder
 
 OG_clanfinder = lapply(OG_trees, clanFinder, ut = c('Olat', 'Gacu', 'Drer', 'Locu', 'Mmus', 'Hsap'))
 
-# Play a bit with the datastructure
-names(OG_trees)
-# the names of the trees in the different clans in the OG groups are named by a integer
-names(OG_clanfinder)
-names(OG_clanfinder[1])
-names(OG_clanfinder[[1]])
-names(OG_clanfinder$OG0000000.)
-OG_clanfinder[[1]][1]
+# # Play a bit with the datastructure
+# names(OG_trees)
+# # the names of the trees in the different clans in the OG groups are named by a integer
+# names(OG_clanfinder)
+# names(OG_clanfinder[1])
+# names(OG_clanfinder[[1]])
+# names(OG_clanfinder$OG0000000.)
+# OG_clanfinder[[1]][1]
 
 # 3) fixing names
 
 # some of the OG clans are empty, we need to remove these
 OG_clanfinder.filt <- OG_clanfinder[sapply(OG_clanfinder, length)>0]
-length(OG_clanfinder)
-length(OG_clanfinder.filt)
-
-
 clans.num <- as.numeric(unlist(sapply(OG_clanfinder.filt, function(i) 1:length(i))))
 OG_clans <- unlist(OG_clanfinder.filt, recursive = F)
 head(names(OG_clans))
@@ -109,7 +105,7 @@ OG_clans = lapply(OG_clans, function(i){
 #Note - names of clans where the OG represented a single clans: .0
 
 # is there redundancy in OG_clans??
-orthogrtips = unlist(sapply(OG_trees, function(i) i$tip.label))
+orthogrtips = unlist(sapply(trees, function(i) i$tip.label))
 table(duplicated(orthogrtips))
 
 clantips = unlist(sapply(OG_clans, function(i) i$tip.label))
