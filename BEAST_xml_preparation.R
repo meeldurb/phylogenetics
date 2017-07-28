@@ -149,32 +149,16 @@ for(ali in alignment.files){
     if (!file.size(ali) == 0){
       # the alignment file can now be read in 
       # the command line to run with python script
-      d <- read.fasta(ali, as.string=T)
-  
+
   } else {
       print ("file is empty")
     }
   }
 } 
 
-# import ID
-pat.id = ".*(OG\\d*).fa"
-OG.id <- sub(pattern = pat.id, "\\1", ali)
-
-pat.id.xml = "OG\\d*"
-id <- sub(pattern = pat.id.xml, replace = OG.id, x = xml[5])
-
-xml[5]
-# change datatype depending on nt/aa
-
+# change OG ID number
 # import alignment
-
-# import the taxids
-
 # import monophyletic groups or priors
-
-# change the filenames
-
 ## do it in python
 
 convertcmd <- paste("python transform_XML.py", ali, xml, OG)
