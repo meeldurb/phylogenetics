@@ -72,8 +72,10 @@ OG_clans = lapply(OG_clans, function(i){
 #--------------------------------------------------#
 ##____ filter clans based on species included ____##
 #--------------------------------------------------#
+i <- OG_clans$OG0000000_2.
 
-salmonid.tips = sapply(OG_clans, function(i) sum(unique(substr(i$tip.label, 1, 4)) %in% sal))
+salmonid.tips = sapply(OG_clans, function(i) sum(unique(substr(i$tip.label, 1, 4)) 
+                                                 %in% 'Ssal'))
 eluc.tips = sapply(OG_clans, function(i) sum(substr(i$tip.label, 1, 4) %in% 'Eluc'))
 
 # Filter clans: including minimum 2 salmonid species AND Eluc
