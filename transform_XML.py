@@ -63,9 +63,8 @@ def parse_into_xml(xml_filename, ali_filename):
                     full_seq_new = ''
                 
                 elif ID_match:
-                    print line, "match"
+                    #print line, "match"
                     old_ID = ID_match.group(1)
-                    #full_ID_new = 'id="' + new_ID + '"\n'
                     xml_out.write(line.replace(old_ID, new_ID))
                 
                 else:
