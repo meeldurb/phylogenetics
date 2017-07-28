@@ -147,9 +147,9 @@ for(ali in alignment.files){
   # checking if file is .fa file and if not empty
   if (grepl('.fa', ali)){ 
     if (!file.size(ali) == 0){
-  # read all alignments of the .fa file
-  ali.fasta <- read.fasta(ali)
-    
+      # the alignment file can now be read in 
+      # the command line to run with python script
+      d <- read.fasta(ali, as.string=T)
   
   } else {
       print ("file is empty")
@@ -192,7 +192,7 @@ system(convertcmd)
   # I AM NOT SURE WHY WE WOULD USE THIS ORTHOLOGS LIST
   #clan.info  = orthologs.list[[clan]]
   
-  clan.info = OG_clans_dupl[[clan]]
+  clan.info = OG_clans_dupl[clan]
   # we can plot the tree from this OG ID
   plot(clan)
   
