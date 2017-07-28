@@ -36,7 +36,7 @@ def get_ali_filename(argv):
 
 def parse_into_xml(xml_filename, ali_filename):
     full_seq_new = ''
-    ID_pattern = re.compile(r'id="(OG\d+)"')
+    ID_pattern = re.compile(r'(OG\d+)')
     new_ID = get_ali_ID(ali_filename)
     seq_pattern = re.compile(r'(\s+<sequence id="seq_)(.+)("\s+taxon=")(.+)' \
                              '("\s* totalcount="\d+)(" value=")(.*)("\/>)')
@@ -44,7 +44,7 @@ def parse_into_xml(xml_filename, ali_filename):
         with open("xml_out.xml", "wt") as xml_out:
             for line in xml_in:
                 seq_match = seq_pattern.match(line)
-                ID_match = ID_pattern.match(line)
+                ID_match = ID_pattern.search(line)
                 if seq_match:
                     s_beg = seq_match.group(1)
                     s_name = seq_match.group(2)
@@ -63,9 +63,10 @@ def parse_into_xml(xml_filename, ali_filename):
                     full_seq_new = ''
                 
                 elif ID_match:
+                    print line, "match"
                     old_ID = ID_match.group(1)
-                    full_ID_new = 'id="' + new_ID + '"\n'
-                    xml_out.write(old_ID.replace(old_ID, full_ID_new))
+                    #full_ID_new = 'id="' + new_ID + '"\n'
+                    xml_out.write(line.replace(old_ID, new_ID))
                 
                 else:
                     xml_out.write(line)
