@@ -363,5 +363,5 @@ save(OG_clans_dupl, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
                                   sep = ''))
 OG_clans_dupl <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
                                  '/Beast_dating_salmonids/RData/',
-                                 'Clans_2analyze_inBeast_withduplicates.RData', 
+                                 'Clans_2analyze_inBeast_withduplicates_aa.RData', 
                                  sep = ''))
