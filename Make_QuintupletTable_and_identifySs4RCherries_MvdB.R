@@ -21,75 +21,16 @@ source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
 ## NB: clanfinder_v2 er buggy! her faar vi ut masse dritt som er redundant
 
 
-#-------------------------------------------------#
-##____ make initial clans from protein trees ____##
-#-------------------------------------------------#
+#---------------------#
+##____ Load data ____##
+#---------------------#
 
-# 1) load orthotrees
+# 1) load OG clans
 
-# - this is the output from protein trees made 
-# from orthogroup sets of sequences (from orthofinder)
-trees <- loadRData(paste('C:/Users/meeldurb/Google Drive/Master internship ',
-                         'phylogenetics salmonids/Salmonid_genomics_resources/',
-                         'Orthologs_homeologs/orthogroups.03.06.2017/',
-                         'OG_trees.30.05.2017.RData', sep = ''))
-# total number of orthogroups
-length(trees) 
-# summing up the number of specific species in the trees
-table(sapply(trees, function(i) sum(c('Ssal', 'Omyk') %in% substr(i$tip.label, 1, 4))))
-
-
-# 2) make clans using clanfinder
-OG_clanfinder = lapply(trees, clanFinder, ut = c('Olat', 'Gacu', 'Drer', 'Locu', 'Mmus', 'Hsap'))
-
-# 3) fixing names
-
-# some of the OG clans are empty, we need to remove these
-OG_clanfinder.filt <- OG_clanfinder[sapply(OG_clanfinder, length)>0]
-clans.num <- as.numeric(unlist(sapply(OG_clanfinder.filt, function(i) 1:length(i))))
-OG_clans <- unlist(OG_clanfinder.filt, recursive = F)
-names(OG_clans) <- paste(substr(names(OG_clans), 1, 9), paste(clans.num, '.', sep=''), sep='_')
-
-
-# fix O.mykiss names in trees from proteinID to geneID
-# taken from this dataframe
-name.tab = read.table(paste('C:/users/meeldurb/Google Drive/', 
-                            'Master internship phylogenetics salmonids/',
-                            'Salmonid_genomics_resources/Orthologs_homeologs/', 
-                            'orthogroups.03.06.2017/Omyk.gene2protein.table.txt', 
-                            sep = ''), header = T)
-
-table(duplicated(name.tab$protein))
-table(duplicated(name.tab$gene_id))
-
-OG_clans = lapply(OG_clans, function(i){
-  tr = i
-  tips = i$tip.label
-  tips[!is.na(match(sub('Omyk\\|', '', tips), name.tab$protein))] <- paste('Omyk|', name.tab$gene_id[na.omit(match(sub('Omyk\\|', '', tips), name.tab$protein))], sep='')
-  tr$tip.label <- tips
-  tr
-}
-)
-
-
-#--------------------------------------------------#
-##____ filter clans based on species included ____##
-#--------------------------------------------------#
-i <- OG_clans$OG0000003_8.
-
-salmonids <- c("Ssal", "Omyk")
-
-# We want Ssal and Omyk in the trees
-salmonid.tips = sapply(OG_clans, function(i) sum(unique(substr(i$tip.label, 1, 4)) 
-                                                 %in%  salmonids))
-# We also want Eluc in the trees
-eluc.tips = sapply(OG_clans, function(i) sum(substr(i$tip.label, 1, 4) %in% 'Eluc'))
-
-# Filter clans: including minimum 2 salmonid species AND Eluc
-table(salmonid.tips>=2 & eluc.tips>0)
-OG_clans_filt = OG_clans[which(salmonid.tips>=2 & eluc.tips>0)]
-
-
+filtered_OG_clans <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
+                                 '/Beast_dating_salmonids/RData/',
+                                 'Clans_2analyze_inBeast_withduplicatesandElucfilt_aa.RData', 
+                                 sep = ''))
 
 
 
