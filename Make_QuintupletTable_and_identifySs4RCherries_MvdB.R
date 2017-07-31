@@ -1,4 +1,11 @@
-# pipeline for quality control and x-checking trees with dup-predictions
+#!usr/bin/env Rscript
+
+###################################################################
+##Author: Melanie van den Bosch & Simen Rod Sandve
+##Pipeline for quality control and x-checking trees 
+##with dup-predictions
+###################################################################
+
 
 #--------------------------------------#
 ##____ load libraries & functions ____##
@@ -35,17 +42,18 @@ filtered_OG_clans <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
 
 
 
-##---------------------------------------------------------------------##
-## making tables with quintuplets: RT dups + Sal dups + pike orhtolog ###
-##---------------------------------------------------------------------##
-
-ssal.d <- loadRData(paste('C:/Users/meeldurb/Google Drive/',
-                'Master internship phylogenetics salmonids/',
-                'Salmonid_genomics_resources/Orthologs_homeologs/',
-                'Homeologs/OmykV6_2016_best_in_homelogRegions_',
-                'minpident80_mincov50_phylofiltered.RData', sep = ''))
+##------------------------------------##
+## Making tables with quintuplets:    ##
+## RT dups + Sal dups + pike ortholog ##
+##------------------------------------##
 
 omyk.d <- loadRData(paste('C:/Users/meeldurb/Google Drive/',
+                          'Master internship phylogenetics salmonids/',
+                          'Salmonid_genomics_resources/Orthologs_homeologs/',
+                          'Homeologs/OmykV6_2016_best_in_homelogRegions_',
+                          'minpident80_mincov50_phylofiltered.RData', sep = ''))
+
+ssal.d <- loadRData(paste('C:/Users/meeldurb/Google Drive/',
                           'Master internship phylogenetics salmonids/',
                           'Salmonid_genomics_resources/Orthologs_homeologs/',
                           'Homeologs/RefSeq_GarethLongest_2016_best_',
@@ -53,34 +61,46 @@ omyk.d <- loadRData(paste('C:/Users/meeldurb/Google Drive/',
                           'phylofiltered.RData', sep = ''))
 
 
+#i <- filtered_OG_clans$OG0009992_1
 
-
-dups.inclans.ssal = sapply(OG_clans_filt, function(i) {
+# find the number of duplicates for Ssal
+dups.inclans.ssal = sapply(filtered_OG_clans, function(i) {
   tips = substr(i$tip.label, 6, 100) 
   qs = na.omit(match(tips, ssal.d$qseqid))
   ss = na.omit(match(tips, ssal.d$sseqid))
-  if(length(qs)==0 | length(ss)==0 ) return(NA)
-  qs.gene = ssal.d$qseqid[qs]; ss.gene = ssal.d$sseqid[ss]
-  length(c(qs.gene, ss.gene))
-}
+  if(length(qs)==0 | length(ss)==0 ) {
+    return(NA)
+  } else {
+    qs.gene = ssal.d$qseqid[qs]
+    ss.gene = ssal.d$sseqid[ss]
+    length(c(qs.gene, ss.gene))
+    }
+  }
 )
 
 table(dups.inclans.ssal, useNA = 'always')
-#names(which(dups.inclans.ssal>2))
+names(which(dups.inclans.ssal>2))
 
-# omyk...
-dups.inclans.omyk = sapply(OG_clans_filt, function(i) {
+
+#i <- filtered_OG_clans$OG0008390_1.
+
+# find the number of duplicates for Omyk
+dups.inclans.omyk = sapply(filtered_OG_clans, function(i) {
   tips = substr(i$tip.label, 6, 100) 
   qs = na.omit(match(tips, omyk.d$qseqid))
   ss = na.omit(match(tips, omyk.d$sseqid))
-  if(length(qs)==0 | length(ss)==0 ) return(NA)
-  qs.gene = omyk.d$qseqid[qs]; ss.gene = omyk.d$sseqid[ss]
-  length(c(qs.gene, ss.gene))
-}
+  if(length(qs)==0 | length(ss)==0 ) {
+    return(NA)
+  } else{
+    qs.gene = omyk.d$qseqid[qs]
+    ss.gene = omyk.d$sseqid[ss]
+    length(c(qs.gene, ss.gene))
+    }
+  }
 )
 
 table(dups.inclans.omyk, useNA = 'always')
-#names(which(dups.inclans.omyk>2))
+names(which(dups.inclans.omyk>2))
 
 # dups.inclans.ssal
 # 2    3    4    6    8   10 <NA> 
@@ -89,11 +109,12 @@ table(dups.inclans.omyk, useNA = 'always')
 # dups.inclans.omyk
 # 2     3     4     8  <NA> 
 #   6026     4    64     1 12757
-
 # 
 table(dups.inclans.omyk==2 & dups.inclans.ssal==2, useNA = 'always')
-OG_clans_dups = OG_clans_filt[which(dups.inclans.omyk==2 & dups.inclans.ssal==2)]
-length(dups.inclans.omyk); length(OG_clans_filt)
+OG_clans_dups = filtered_OG_clans[which(dups.inclans.omyk==2 & dups.inclans.ssal==2)]
+
+length(filtered_OG_clans)
+length(OG_clans_dups)
 
 dup.table = lapply(OG_clans_dups, function(i) {
   ssal.qs = na.omit(match(substr(i$tip.label,  6, 100), ssal.d$qseqid))
