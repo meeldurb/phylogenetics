@@ -14,6 +14,9 @@ source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
 source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
              'Master_internship_phylogenetics/',
              'Phylogenomics/Phylo_functions.R', sep = ''))
+source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
+             'Master_internship_phylogenetics/',
+             'Phylogenetics/loadRData.R', sep = ''))
 
 ## NB: clanfinder_v2 er buggy! her faar vi ut masse dritt som er redundant
 
@@ -72,10 +75,14 @@ OG_clans = lapply(OG_clans, function(i){
 #--------------------------------------------------#
 ##____ filter clans based on species included ____##
 #--------------------------------------------------#
-i <- OG_clans$OG0000000_2.
+i <- OG_clans$OG0000003_8.
 
+salmonids <- c("Ssal", "Omyk")
+
+# We want Ssal and Omyk in the trees
 salmonid.tips = sapply(OG_clans, function(i) sum(unique(substr(i$tip.label, 1, 4)) 
-                                                 %in% 'Ssal'))
+                                                 %in%  salmonids))
+# We also want Eluc in the trees
 eluc.tips = sapply(OG_clans, function(i) sum(substr(i$tip.label, 1, 4) %in% 'Eluc'))
 
 # Filter clans: including minimum 2 salmonid species AND Eluc
