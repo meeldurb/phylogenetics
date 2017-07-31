@@ -349,15 +349,28 @@ fulldf.check <- unique(names(c(OG_clans_dupl.omyk, OG_clans_dupl.ssal)))
 length(fulldf.check)
 
 ##---------------------------##
+#______ Check for pike _______#
+##---------------------------##
+
+# We also want Eluc in the trees
+eluc.tips = sapply(OG_clans_dupl, function(i) sum(substr(i$tip.label, 1, 4) %in% 'Eluc'))
+
+table(eluc.tips>0)
+
+OG_clans_dupl_Eluc_filt = OG_clans_dupl[which(eluc.tips>0)]
+
+
+##---------------------------##
 #______ Write out data _______#
 ##---------------------------##
 
 
-save(OG_clans_dupl, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
+
+save(OG_clans_dupl_Eluc_filt, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
                                   '/Beast_dating_salmonids/RData/',
-                                  'Clans_2analyze_inBeast_withduplicates_aa.RData', 
+                                  'Clans_2analyze_inBeast_withduplicatesandElucfilt_aa.RData', 
                                   sep = ''))
 OG_clans_dupl <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
                                  '/Beast_dating_salmonids/RData/',
-                                 'Clans_2analyze_inBeast_withduplicates_aa.RData', 
+                                 'Clans_2analyze_inBeast_withduplicatesandElucfilt_aa.RData', 
                                  sep = ''))
