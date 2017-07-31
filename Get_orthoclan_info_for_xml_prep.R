@@ -253,7 +253,8 @@ OG_clans_filt_2analyze <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
                                           '/Beast_dating_salmonids/RData/',
                                           'Clans_2analyze_inBeast_aa.RData', sep = ''))
 
-# use dup tables below and check that clans contain at least one dup pair of one of the species...
+# use dup tables below and check that clans contain 
+# at least one dup pair of one of the species...
 #/Users/srsand/Google\ Drive/Salmonid_genomics_resources/Orthologs_homeologs/Homeologs/OmykV6_2016_best_in_homelogRegions_minpident80_mincov50_phylofiltered.RData
 #/Users/srsand/Google\ Drive/Salmonid_genomics_resources/Orthologs_homeologs/Homeologs/RefSeq_GarethLongest_2016_best_in_homelogRegions_minpident80_mincov50_phylofiltered.RData 
 
