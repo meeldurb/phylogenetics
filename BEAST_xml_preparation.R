@@ -20,22 +20,27 @@ library("ape")
 library("phangorn")
 library("plyr")
 require("seqinr")
+library("RCurl")
 
-source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
-             'Master_internship_phylogenetics/phylogenomics/',
-             'auto.root_salmonid_clans.R', sep = "" ))
+# clanfinder function
+eval(parse(text = getURL(paste("https://raw.githubusercontent.com/",
+                               "srsand/Phylogenomics/master/clanfinder.R", 
+                               sep = ""), ssl.verifypeer = FALSE)))
 
-source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
-             'Master_internship_phylogenetics/phylogenetics/',
-             'auto.root_salmonid_clans_MvdB.R', sep = "" ))
+# phylo functions
+eval(parse(text = getURL(paste("https://raw.githubusercontent.com/",
+                               "srsand/Phylogenomics/master/Phylo_functions.R", 
+                               sep = ""), ssl.verifypeer = FALSE)))
 
-source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
-             'Master_internship_phylogenetics/phylogenetics/',
-              'orthologfinder_MvdB.R', sep = ""))
+# autoroot function
+eval(parse(text = getURL(paste("https://raw.githubusercontent.com/",
+                               "srsand/Phylogenomics/master/auto.root_salmonid_clans.R", 
+                               sep = ""), ssl.verifypeer = FALSE)))
 
-source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
-             'Master_internship_phylogenetics/',
-             'Phylogenetics/loadRData.R', sep = ''))
+# loadRData in variable function
+eval(parse(text = getURL(paste("https://raw.githubusercontent.com/",
+                               "meeldurb/phylogenetics/master/loadRData.R", 
+                               sep = ""), ssl.verifypeer = FALSE)))
 
 
 
