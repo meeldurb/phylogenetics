@@ -13,17 +13,33 @@
 
 library(ape)
 library(phangorn)
+library(plyr)
+library(RCurl)
 
 
-source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
-             'Master_internship_phylogenetics/',
-             'Phylogenomics/clanfinder.R', sep = ''))
-source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
-             'Master_internship_phylogenetics/',
-             'Phylogenomics/Phylo_functions.R', sep = ''))
-source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
-             'Master_internship_phylogenetics/',
-             'Phylogenetics/loadRData.R', sep = ''))
+# source functions
+
+# clanfinder function
+eval(parse(text = getURL(paste("https://raw.githubusercontent.com/",
+                               "srsand/Phylogenomics/master/clanfinder.R", 
+                               sep = ""), ssl.verifypeer = FALSE)))
+
+# phylo functions
+eval(parse(text = getURL(paste("https://raw.githubusercontent.com/",
+                               "srsand/Phylogenomics/master/Phylo_functions.R", 
+                               sep = ""), ssl.verifypeer = FALSE)))
+
+# autoroot function
+eval(parse(text = getURL(paste("https://raw.githubusercontent.com/",
+                               "srsand/Phylogenomics/master/auto.root_salmonid_clans.R", 
+                               sep = ""), ssl.verifypeer = FALSE)))
+
+# loadRData in variable function
+eval(parse(text = getURL(paste("https://raw.githubusercontent.com/",
+                               "meeldurb/phylogenetics/master/loadRData.R", 
+                               sep = ""), ssl.verifypeer = FALSE)))
+
+
 
 ## NB: clanfinder_v2 er buggy! her faar vi ut masse dritt som er redundant
 
@@ -42,10 +58,9 @@ filtered_OG_clans <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
 
 
 
-##------------------------------------##
-## Making tables with quintuplets:    ##
-## RT dups + Sal dups + pike ortholog ##
-##------------------------------------##
+##-------------------------------------##
+## ______ Filter for duplicates ______ ##
+##-------------------------------------##
 
 omyk.d <- loadRData(paste('C:/Users/meeldurb/Google Drive/',
                           'Master internship phylogenetics salmonids/',
@@ -102,31 +117,59 @@ dups.inclans.omyk = sapply(filtered_OG_clans, function(i) {
 table(dups.inclans.omyk, useNA = 'always')
 names(which(dups.inclans.omyk>2))
 
-# dups.inclans.ssal
-# 2    3    4    6    8   10 <NA> 
-#   9017   14   58    3    1    1 9758 
+#dups.inclans.omyk
+#    2    3 <NA> 
+#  950    1  977  
 
-# dups.inclans.omyk
-# 2     3     4     8  <NA> 
-#   6026     4    64     1 12757
-# 
+#dups.inclans.ssal
+#     2    3 <NA> 
+#  1744    1  183 
+
+
 table(dups.inclans.omyk==2 & dups.inclans.ssal==2, useNA = 'always')
 OG_clans_dups = filtered_OG_clans[which(dups.inclans.omyk==2 & dups.inclans.ssal==2)]
 
 length(filtered_OG_clans)
 length(OG_clans_dups)
 
+
+save(OG_clans_dups, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
+                                 '/Beast_dating_salmonids/RData/',
+                                 'Clans_2analyze_inBeast_duplicates_final',
+                                 '_aa.RData', sep = ''))
+OG_clans_dups <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
+                           '/Beast_dating_salmonids/RData/',
+                           'Clans_2analyze_inBeast_duplicates_final',
+                           '_aa.RData', sep = ''))
+
+
+##------------------------------------##
+## Making tables with quintuplets:    ##
+## RT dups + Sal dups + pike ortholog ##
+##------------------------------------##
+
+#i <- OG_clans_dups$OG0008392_1.
+
 dup.table = lapply(OG_clans_dups, function(i) {
+  # find the positions of the duplicates
   ssal.qs = na.omit(match(substr(i$tip.label,  6, 100), ssal.d$qseqid))
   ssal.ss = na.omit(match(substr(i$tip.label,  6, 100), ssal.d$sseqid))
   omyk.qs = na.omit(match(substr(i$tip.label,  6, 100), omyk.d$qseqid))
   omyk.ss = na.omit(match(substr(i$tip.label,  6, 100), omyk.d$sseqid))
   
+  # take the Eluc gene
   eluc = grep('Eluc', i$tip.label, value = T)
   
-  if(ssal.qs==ssal.ss & omyk.qs==omyk.ss & length(eluc)==1) { return(c(eluc, ssal.d$qseqid[ssal.qs], ssal.d$sseqid[ssal.qs],
-                                                                       omyk.d$qseqid[omyk.ss], omyk.d$sseqid[omyk.ss]) )}
-  if(ssal.qs!=ssal.ss | omyk.qs!=omyk.ss | length(eluc)>1) return('PROBLEM')
+  # check if duplicates are found in same position in duplicate tables
+  # meaning they are found on the same line, so are true duplicates
+  # and check if only one Eluc found
+  if(ssal.qs==ssal.ss & omyk.qs==omyk.ss & length(eluc)==1) { 
+    return(c(eluc, ssal.d$qseqid[ssal.qs], ssal.d$sseqid[ssal.qs],
+             omyk.d$qseqid[omyk.ss], omyk.d$sseqid[omyk.ss]))
+    }
+  if(ssal.qs!=ssal.ss | omyk.qs!=omyk.ss | length(eluc)>1) {
+    return('PROBLEM')
+  }
 })
 names(dup.table) <- names(OG_clans_dups)
 table(sapply(dup.table, function(i) length(grep('PROBLEM', i)))) # clans we can use
@@ -134,14 +177,15 @@ table(sapply(dup.table, function(i) length(grep('PROBLEM', i)))) # clans we can 
 dup.table = dup.table[sapply(dup.table, function(i) length(grep('PROBLEM', i)))==0]
 length(dup.table)
 
-library(plyr)
+
+# make a dataframe 
 dup.table = ldply(dup.table, function(i) {
   t(data.frame(i, stringsAsFactors = F))
 })
 
-
-head(dup.table) ## Quintuplets table to use in code below to identify "cherries" and orthologs between ssal and omyk
-
+save(dup.table, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
+                             '/Beast_dating_salmonids/RData/',
+                             '20170801_duplicate_table_aa.RData', sep = ''))
 
 
 ##--------------------------------------------------##
@@ -152,15 +196,28 @@ head(dup.table) ## Quintuplets table to use in code below to identify "cherries"
 
 ## for loop to check consistency between dup table and clan topology
 # setting some objects
-test.tree = list(); test.cherry1 = c(); test.cherry2 = c(); 
-clades=list(); mrca.combo1 = c() ; mrca.combo2 = c()
-cherry1 = c(); cherry2 = c()
-topology.results = c(); lore.results = c(); lore.taxa.names = c(); lore.taxa.results = c()
+test.tree = list() 
+test.cherry1 = c() 
+test.cherry2 = c() 
+
+clades=list() 
+mrca.combo1 = c()
+mrca.combo2 = c()
+
+cherry1 = c()
+cherry2 = c()
+
+topology.results = c() 
+lore.results = c()
+lore.taxa.names = c() 
+lore.taxa.results = c()
+
 dup_cluster_df = matrix(rep(NA), nrow = nrow(dup.table), ncol=4)
 
+i <- 714
 for(i in 1:nrow(dup.table)){
   #print(i)
-  test.tree <- OG_clans_expr[[dup.table$.id[i]]]
+  test.tree <- OG_clans_dups[[dup.table$.id[i]]]
   test.tree <- auto.root(test.tree)$rooted.clans # Alternative 1
   #test.tree <- unroot(test.tree) # Alternative 2 ==> gives 2158 good and 2985 inconsisten topologies
   #print(test.tree$tip.label)
