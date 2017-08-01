@@ -23,16 +23,23 @@ library(seqinr)
 library(plyr)
 
 
+# source functions
 
-source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
-             'Master_internship_phylogenetics/',
-             'Phylogenomics/clanfinder.R', sep = ''))
-source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
-             'Master_internship_phylogenetics/',
-             'Phylogenomics/Phylo_functions.R', sep = ''))
-source(paste('C:/Users/meeldurb/Dropbox/Melanie/',
-             'Master_internship_phylogenetics/',
-             'Phylogenetics/loadRData.R', sep = ''))
+
+# clanfinder function
+eval(parse(text = getURL(paste("https://raw.githubusercontent.com/",
+                               "srsand/Phylogenomics/master/clanfinder.R", 
+                               sep = ""), ssl.verifypeer = FALSE)))
+
+# phylo functions
+eval(parse(text = getURL(paste("https://raw.githubusercontent.com/",
+                               "srsand/Phylogenomics/master/Phylo_functions.R", 
+                               sep = ""), ssl.verifypeer = FALSE)))
+
+# loadRData in variable function
+eval(parse(text = getURL(paste("https://raw.githubusercontent.com/",
+                               "meeldurb/phylogenetics/master/loadRData.R", 
+                               sep = ""), ssl.verifypeer = FALSE)))
 
 
 
