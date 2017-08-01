@@ -188,6 +188,10 @@ save(dup.table, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
                              '20170801_duplicate_table_aa.RData', sep = ''))
 
 
+dup.table <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
+                             '/Beast_dating_salmonids/RData/',
+                             '20170801_duplicate_table_aa.RData', sep = ''))
+
 ##--------------------------------------------------##
 ##       Identify Ss4R-cherries and orthologs       ##
 ##--------------------------------------------------##
@@ -196,69 +200,74 @@ save(dup.table, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
 
 ## for loop to check consistency between dup table and clan topology
 # setting some objects
-test.tree = list() 
-test.cherry1 = c() 
-test.cherry2 = c() 
-
-clades=list() 
-mrca.combo1 = c()
-mrca.combo2 = c()
-
-cherry1 = c()
-cherry2 = c()
 
 topology.results = c() 
 lore.results = c()
-lore.taxa.names = c() 
 lore.taxa.results = c()
 
 dup_cluster_df = matrix(rep(NA), nrow = nrow(dup.table), ncol=4)
 
-i <- 714
+#i <- 714
 for(i in 1:nrow(dup.table)){
   #print(i)
   test.tree <- OG_clans_dups[[dup.table$.id[i]]]
   test.tree <- auto.root(test.tree)$rooted.clans # Alternative 1
   #test.tree <- unroot(test.tree) # Alternative 2 ==> gives 2158 good and 2985 inconsisten topologies
   #print(test.tree$tip.label)
-  #plot(test.tree); nodelabels()
+  plot(test.tree); nodelabels(); tiplabels()
   
-  mrca.combo1 = getMRCA(test.tree, tip = c(paste('Ssal|', dup.table[i,3], sep=''), paste('Omyk|', dup.table[i,5], sep='')))
-  mrca.combo2 = getMRCA(test.tree, tip = c(paste('Ssal|', dup.table[i,3], sep=''), paste('Omyk|', dup.table[i,6], sep='')))
-  test.cherry1 = unlist(Descendants(test.tree, mrca.combo1, type='tips'))
-  test.cherry2 = unlist(Descendants(test.tree, mrca.combo2, type='tips'))
+  # get MRCA of 
+  mrca.combo1 = getMRCA(test.tree, tip = c(paste('Ssal|', dup.table[i,3], sep=''), 
+                                           paste('Omyk|', dup.table[i,5], sep='')))
+  mrca.combo2 = getMRCA(test.tree, tip = c(paste('Ssal|', dup.table[i,3], sep=''), 
+                                           paste('Omyk|', dup.table[i,6], sep='')))
+  test.cherry1 = Descendants(test.tree, mrca.combo1, type='tips')[[1]]
+  test.cherry2 = Descendants(test.tree, mrca.combo2, type='tips')[[1]]
   
-  # choose which combo of ssal and omyk dup gives a mrca with smallest descedants clade size
-  if(length(test.cherry1)<length(test.cherry2)) { clades = list(clade1=c(3,5), clade2=c(4,6))
-  } else clades = list(clade1=c(3,6), clade2=c(4,5))
+  # select which combo of ssal and omyk duplicates
+  # gives a mrca with smallest descedants clade size
+   if(length(test.cherry1) < length(test.cherry2)) { 
+    clades = list(clade1=c(3,5), clade2=c(4,6))
+    } else {
+      clades = list(clade1=c(3,6), clade2=c(4,5))
+    }
   
+  # combine the correct duplicates in a dataframe
   dup_cluster_df[i, 1] <- paste('Ssal|', dup.table[i, clades[[1]][1]], sep='')
   dup_cluster_df[i, 2] <- paste('Omyk|', dup.table[i, clades[[1]][2]], sep='')
   dup_cluster_df[i, 3] <- paste('Ssal|', dup.table[i, clades[[2]][1]], sep='')
   dup_cluster_df[i, 4] <- paste('Omyk|', dup.table[i, clades[[2]][2]], sep='')
   
   
-  # test if both cherry clades only contains 1 ssal and 1 omyk dup
-  cherry1 = test.tree$tip.label[unlist(Descendants(test.tree, getMRCA(test.tree, c(paste('Ssal|', dup.table[i, clades[[1]][1]], sep=''),
-                                                                                   paste('Omyk|', dup.table[i, clades[[1]][2]], sep=''))), type='tips'))]
+  # testing if both cherry clades only contains 1 ssal and 1 omyk duplicate
+  cherry1 = test.tree$tip.label[unlist(Descendants(test.tree, 
+            getMRCA(test.tree, c(paste('Ssal|', dup.table[i, clades[[1]][1]], sep=''),
+            paste('Omyk|', dup.table[i, clades[[1]][2]], sep=''))), type='tips'))]
   
-  cherry2 = test.tree$tip.label[unlist(Descendants(test.tree, getMRCA(test.tree, c(paste('Ssal|', dup.table[i, clades[[2]][1]], sep=''),
-                                                                                   paste('Omyk|', dup.table[i, clades[[2]][2]], sep=''))), type='tips'))]
+  cherry2 = test.tree$tip.label[unlist(Descendants(test.tree, 
+            getMRCA(test.tree, c(paste('Ssal|', dup.table[i, clades[[2]][1]], sep=''),
+            paste('Omyk|', dup.table[i, clades[[2]][2]], sep=''))), type='tips'))]
   
-  if(any(cherry1 %in% cherry2))  topology.results[i] <- 'Topology Incongruence'
-  if(!any(cherry1 %in% cherry2)) topology.results[i] <- 'Good Topology'
+  if(any(cherry1 %in% cherry2)){
+    topology.results[i] <- 'Topology Incongruence'
+  }
+  if(!any(cherry1 %in% cherry2)){
+    topology.results[i] <- 'Good Topology'
+  }
   
-  lore.results[i] <- sum(sapply(c('Tthy', 'Ssal', 'Omyk', 'Okis'), function(i){
-    ifelse(length(grep(i,  test.tree$tip.label))>0,  is.monophyletic(test.tree, grep(i, test.tree$tip.label)), NA)
-  } 
-  ), na.rm = T)
-  
-  lore.taxa.names = sapply(c('Tthy', 'Ssal', 'Omyk', 'Okis'), function(i){
-    ifelse(length(grep(i,  test.tree$tip.label))>0,  is.monophyletic(test.tree, grep(i, test.tree$tip.label)), NA)
-  } 
-  )
-  
-  lore.taxa.results[i] <- paste(sort(names(lore.taxa.names)[lore.taxa.names]), collapse='|')
+  # lore.results[i] <- sum(sapply(c('Tthy', 'Ssal', 'Omyk', 'Okis'), function(i){
+  #   ifelse(length(grep(i,  test.tree$tip.label))>0, 
+  #          is.monophyletic(test.tree, grep(i, test.tree$tip.label)), NA)
+  # } 
+  # ), na.rm = T)
+  # 
+  # lore.taxa.names = sapply(c('Tthy', 'Ssal', 'Omyk', 'Okis'), function(i){
+  #   ifelse(length(grep(i,  test.tree$tip.label))>0,  
+  #          is.monophyletic(test.tree, grep(i, test.tree$tip.label)), NA)
+  # } 
+  # )
+  # 
+  # lore.taxa.results[i] <- paste(sort(names(lore.taxa.names)[lore.taxa.names]), collapse='|')
   
 }
 
@@ -270,6 +279,10 @@ dup_cluster_fix = cbind(dup.table[,1:2], dup_cluster_df)
 dup_cluster_phylofilt = dup_cluster_fix[topology.results!='Topology Incongruence', ]
 nb.dupsinclusters.filt <- nrow(dup_cluster_phylofilt)
 
-head(nb.dupsinclusters.filt) # final quintuplettable sorted based on tree topology information (ie ortholog/ohnolog relationships)
+head(nb.dupsinclusters.filt) 
+# final quintuplettable sorted based on tree topology information 
+# (ie ortholog/ohnolog relationships)
 
-
+save(dup_cluster_phylofilt, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
+                                         '/Beast_dating_salmonids/RData/',
+                                         '20170801_duplicate_clans_filtered_aa.RData', sep = ''))
