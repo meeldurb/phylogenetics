@@ -277,12 +277,23 @@ for(i in 1:nrow(dup.table)){
 colnames(dup_cluster_df) <- c('Ssal1', 'Omyk1', 'Ssal2', 'Omyk2')
 dup_cluster_fix = cbind(dup.table[,1:2], dup_cluster_df)
 dup_cluster_phylofilt = dup_cluster_fix[topology.results!='Topology Incongruence', ]
-nb.dupsinclusters.filt <- nrow(dup_cluster_phylofilt)
 
-head(nb.dupsinclusters.filt) 
 # final quintuplettable sorted based on tree topology information 
 # (ie ortholog/ohnolog relationships)
 
 save(dup_cluster_phylofilt, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
-                                         '/Beast_dating_salmonids/RData/',
-                                         '20170801_duplicate_clans_filtered_aa.RData', sep = ''))
+                                         'Beast_dating_salmonids/RData/',
+                                         '20170801_duplicate_clans_filtered_aa.RData', 
+                                         sep = ''))
+
+dup_cluster_phylofilt <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
+                                         'Beast_dating_salmonids/RData/',
+                                         '20170801_duplicate_clans_filtered_aa.RData', 
+                                         sep = ''))
+
+write.table(dup_cluster_phylofilt, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
+                                                'Beast_dating_salmonids/RData/',
+                                                '20170801_duplicate_clans_filtered_aa.csv',
+                                                sep = ''), 
+            append = FALSE, sep = ';', quote = FALSE, row.names = FALSE, col.names = TRUE)
+
