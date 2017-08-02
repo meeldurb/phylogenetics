@@ -32,7 +32,18 @@ def get_ali_filename(argv):
         xml_filename -- string, name of the file provided as argument
     """
     ali_filename = argv[2]
-    return ali_filename 
+    return ali_filename
+
+def get_duplicates_filename(argv):
+    """ Returns the filename of the duplicates from the command line
+
+    Keyword arguments:
+        argv -- The list with arguments for this script
+    Returns:
+        dup_filename -- string, name of the file provided as argument
+    """
+    dup_filename = argv[3]
+    return dup_filename
 
 def parse_into_xml(xml_filename, ali_filename):
     full_seq_new = ''
@@ -113,8 +124,12 @@ if __name__ == "__main__":
     #ali_filename = get_ali_filename(argv)
     ali_filename = "C:/Users/meeldurb/Google Drive/Master internship" \
                     " phylogenetics salmonids/Salmonid_genomics_resources/" \
-                    "Orthologs_homeologs/orthogroups.03.06.2017/Alignments/OG0008390.fa"
+                    "Orthologs_homeologs/orthogroups.03.06.2017/" \
+                    "Alignments/OG0008390.fa"
     xml = "dummy_xml/secondary_constr_aa.xml"
+    dup_filename = "C:/Users/meeldurb/Dropbox/Melanie/" \
+                   "Beast_dating_salmonids/RData/20170801_" \
+                   "duplicate_clans_filtered_aa.csv"
     parse_into_xml(xml, ali_filename)
     ali = parse_alignment_info(ali_filename)
     #print ali
