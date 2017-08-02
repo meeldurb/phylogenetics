@@ -129,6 +129,15 @@ xml <- readLines(paste('C:/Users/meeldurb/Dropbox/Melanie/',
                        'phylogenetics/dummy_xml/secondary_constr_aa.xml', sep = ''))
 
 
+
+dup_cluster_phylofilt <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
+                                         'Beast_dating_salmonids/RData/',
+                                         '20170801_duplicate_clans_filtered_aa.RData', 
+                                         sep = ''))
+
+# get table with duplicates
+
+
 # orthologs.list <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
 #                                  'Beast_dating_salmonids/orthologs_list_20161115.RData',
 #                                  sep = ''))
@@ -157,7 +166,8 @@ for(ali in alignment.files){
 
   } else {
       print ("file is empty")
-    }
+  }
+    
   }
 } 
 
