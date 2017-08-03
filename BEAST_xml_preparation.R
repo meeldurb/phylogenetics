@@ -140,15 +140,14 @@ for(clan in names(OG_clans_dupl)){
   # checking if file is not empty
     if (!file.size(ali.file) == 0){
       # only isolate sequences that are also in the tip.labels of the clans
-      clan.genes <- OG_clans_dupl[[clan]][3]
+      clan.select <- OG_clans_dupl[[clan]]
+      clan.genes <- clan.select$tip.label
       seqs <- read.fasta(ali.file)
+      
       # fixing names in seqs to resemble names in clans tip.labels
       # remove double species name
       names(seqs) <- lapply(names(seqs), function(i){
           gsub("\\w*_(\\w*\\|.*)", "\\1", i) })
-        
-        
-      
       # fix Omyk names from proteinID to geneID
       # taken from Omyk.prot2gene
       names(seqs) <- lapply(names(seqs), function(i){
@@ -160,11 +159,13 @@ for(clan in names(OG_clans_dupl)){
         }
       })
       
-      if (names(seqs) == clan.genes){
+      if (all.equal(sort(names(seqs)), sort(clan.genes))){
         print "alignment file will not be changed"
         
         # the alignment file can now be read in 
         # the command line to run with python script
+      } else {
+        # change the alignment file
       }
         
   } else {
