@@ -107,7 +107,11 @@ dup_cluster_phylofilt <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
                                          sep = ''))
 
 
-
+Omyk.prot2gene = read.table(paste('C:/users/meeldurb/Google Drive/', 
+                            'Master internship phylogenetics salmonids/',
+                            'Salmonid_genomics_resources/Orthologs_homeologs/', 
+                            'orthogroups.03.06.2017/Omyk.gene2protein.table.txt', 
+                            sep = ''), header = T)
 
 # orthologs.list <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
 #                                  'Beast_dating_salmonids/orthologs_list_20161115.RData',
@@ -124,23 +128,50 @@ dup_cluster_phylofilt <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
 ali = paste("C:/Users/meeldurb/Google Drive/Master internship phylogenetics ",
             "salmonids/Salmonid_genomics_resources/Orthologs_homeologs/",
             "orthogroups.03.06.2017/Alignments/OG0008397.fa", sep = "")
+
+clan <- "OG0008390_1."
 count <- 0
 
-for(ali in alignment.files){
-  cat(ali, '\n')
-  cat(count <- count + 1, '\n')
-  # checking if file is .fa file and if not empty
-  if (grepl('.fa', ali)){ 
-    if (!file.size(ali) == 0){
-      # the alignment file can now be read in 
-      # the command line to run with python script
-
+for(clan in names(OG_clans_dupl)){
+  cat(clan, '\n')
+  ali.id <- gsub(".*(OG\\d*)_\\d*\\.", '\\1', clan)
+  ali.file.pos <- match(ali.id, gsub(".*(OG\\d*).fa", '\\1', alignment.files))
+  ali.file <- alignment.files[ali.file.pos]
+  # checking if file is not empty
+    if (!file.size(ali.file) == 0){
+      # only isolate sequences that are also in the tip.labels of the clans
+      clan.genes <- OG_clans_dupl[[clan]][3]
+      seqs <- read.fasta(ali.file)
+      # fixing names in seqs to resemble names in clans tip.labels
+      # remove double species name
+      names(seqs) <- lapply(names(seqs), function(i){
+          gsub("\\w*_(\\w*\\|.*)", "\\1", i) })
+        
+        
+      
+      # fix Omyk names from proteinID to geneID
+      # taken from Omyk.prot2gene
+      names(seqs) <- lapply(names(seqs), function(i){
+        select.row <- match(sub('Omyk\\|', '', i), name.tab$protein) 
+        if (!is.na(select.row)) {
+        i <- paste('Omyk|', name.tab$gene_id[select.row], sep = '')
+        } else {
+          i
+        }
+      })
+      
+      if (names(seqs) == clan.genes){
+        print "alignment file will not be changed"
+        
+        # the alignment file can now be read in 
+        # the command line to run with python script
+      }
+        
   } else {
       print ("file is empty")
-  }
+  } 
     
   }
-} 
 
 # change OG ID number
 # import alignment
