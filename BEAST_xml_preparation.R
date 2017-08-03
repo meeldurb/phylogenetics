@@ -54,35 +54,6 @@ OG_clans_dupl <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
                                  'Clans_2analyze_inBeast_withduplicates_aa.RData', sep = ''))
 
 
-# prepare duplicated pairs table
-
-# get duplicate pairs of Oncorhynchus mykiss (rainbow trout)
-Omyk.duplicates <- loadRData(paste('C:/Users/meeldurb/Google Drive/',
-                            'Master internship phylogenetics salmonids/',
-                            'Salmonid_genomics_resources/Orthologs_homeologs/',
-                            'Homeologs/OmykV6_2016_best_in_homelogRegions_',
-                            'minpident80_mincov50_phylofiltered.RData', sep = ''))[,1:2]
-  
-
-# get duplicate pairs of Salmo salar (Atlantic salmon)
-Ssal.duplicates <- loadRData(paste('C:/Users/meeldurb/Google Drive/',
-                            'Master internship phylogenetics salmonids/',
-                            'Salmonid_genomics_resources/Orthologs_homeologs/',
-                            'Homeologs/RefSeq_GarethLongest_2016_best_',
-                            'in_homelogRegions_minpident80_mincov50_',
-                            'phylofiltered.RData', sep = ''))[,1:2]
-
-# add organism naming in front on duplicate pairs
-omyk.dup <- apply(Omyk.duplicates, 2, function(i) paste('Omyk2|', i, sep=''))
-ssal.dup <- apply(Ssal.duplicates, 2, function(i) paste('Ssal|', i, sep=''))
-
-# bind all homologs in complete dataframe
-dup.table <- data.frame(rbind(omyk.dup, ssal.dup), 
-                        stringsAsFactors = F)
-
-
-
-
 #--------------------------#
 ##_____ Example tree _____##
 #--------------------------#
@@ -129,13 +100,13 @@ xml <- readLines(paste('C:/Users/meeldurb/Dropbox/Melanie/',
                        'phylogenetics/dummy_xml/secondary_constr_aa.xml', sep = ''))
 
 
-
+# get table with duplicate pairs
 dup_cluster_phylofilt <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
                                          'Beast_dating_salmonids/RData/',
                                          '20170801_duplicate_clans_filtered_aa.RData', 
                                          sep = ''))
 
-# get table with duplicates
+
 
 
 # orthologs.list <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
