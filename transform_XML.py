@@ -74,7 +74,7 @@ def parse_into_xml(xml_filename, ali_filename):
                     full_seq_new = ''
                 
                 elif ID_match:
-                    print line, "match"
+                    #print line, "match"
                     old_ID = ID_match.group(1)
                     xml_out.write(line.replace(old_ID, new_ID))
                 
@@ -107,7 +107,7 @@ def parse_alignment_info(ali_filename):
         return ali_dict
 
 def get_ali_ID(ali_filename):
-    ID_pattern = re.compile(r".+(OG.+)._corr.fa")
+    ID_pattern = re.compile(r".+(OG\d+_\d+)._corr.fa")
     ID_match = ID_pattern.match(ali_filename)
     if ID_match:
         new_ID = ID_match.group(1)
