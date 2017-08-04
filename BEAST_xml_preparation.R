@@ -54,11 +54,10 @@ OG_clans_dupl <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
                                  'Clans_2analyze_inBeast_withduplicates_aa.RData', sep = ''))
 
 
-# get file path with all alignments
-alignment.files <- dir(paste('C:/Users/meeldurb/Google Drive/',
-                             'Master internship phylogenetics salmonids/',
-                             'Salmonid_genomics_resources/Orthologs_homeologs/',
-                             'orthogroups.03.06.2017/Alignments/', sep = ''), 
+# get file path with all corrected alignments
+alignment.files <- dir(paste('C:/Users/meeldurb/Dropbox/Melanie/',
+                             'Master_internship_phylogenetics/',
+                             'phylogenetics/Alignments_aa_corrected', sep = ''), 
                              full.names = T)
 
 
@@ -74,12 +73,6 @@ dup_cluster_phylofilt <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
                                          '20170801_duplicate_clans_filtered_aa.RData', 
                                          sep = ''))
 
-# table with Omyk gene and protein names
-Omyk.prot2gene = read.table(paste('C:/users/meeldurb/Google Drive/', 
-                                  'Master internship phylogenetics salmonids/',
-                                  'Salmonid_genomics_resources/Orthologs_homeologs/', 
-                                  'orthogroups.03.06.2017/Omyk.gene2protein.table.txt', 
-                                  sep = ''), header = T)
 
 #--------------------------#
 ##_____ Example tree _____##
@@ -125,21 +118,15 @@ tiplabels()
 ##_____ Make BEAST files, example 1 OG alingment _____##
 #------------------------------------------------------#
 
-#--------------------------------------#
-##_____ Correct alignment files  _____##
-#--------------------------------------#
+
+for (ali in alignment.files){
+  convertcmd <- paste("python transform_XML.py", ali, xml, OG)
+  system(convertcmd)
+  
+}
 
 
-# ali = paste("C:/Users/meeldurb/Google Drive/Master internship phylogenetics ",
-#             "salmonids/Salmonid_genomics_resources/Orthologs_homeologs/",
-#             "orthogroups.03.06.2017/Alignments/OG0008397.fa", sep = "")
-# 
-# clan <- "OG0008390_1."
-# count <- 0
 
-# creating the folder to save the data in
-outfolder <- "Alignments_aa_corrected/"  
-if (!file.exists(outfolder))dir.create(outfolder)
 
 # loop to change the alignment files
 for(clan in names(OG_clans_dupl)){
@@ -172,17 +159,18 @@ for(clan in names(OG_clans_dupl)){
           i
         }
       })
-      if (all.equal(sort(names(seqs)), sort(clan.genes))) {
+      # first check length, then check if they contain the same elements
+      if (length(names(seqs)) == length(clan.genes)){
+        if (all.equal(sort(names(seqs)), sort(clan.genes))) {
         print ("tip.labels are the same")
         # change the alignment file for only the names
         write.fasta(seqs, names(seqs), fileout)
-      } else {
-        print ("tip labels are not the same, making subselection of seqs")
-        # select only the sequences that resemble the tip.labels
-        selected.seqs <- sapply(clan.genes, function(i){
-          selection <- seqs[i] 
-      })
-        write.fasta(selected.seqs, names(seqs), fileout)
+        }
+        } else {
+          print ("tip labels are not the same, making subselection of seqs")
+          # select only the sequences that resemble the tip.labels
+          selected.seqs <- seqs[clan.genes]
+          write.fasta(selected.seqs, names(selected.seqs), fileout)
       }
       } else {
          print ("file is empty")
