@@ -74,7 +74,7 @@ def parse_into_xml(xml_filename, ali_filename):
                     full_seq_new = ''
                 
                 elif ID_match:
-                    #print line, "match"
+                    print line, "match"
                     old_ID = ID_match.group(1)
                     xml_out.write(line.replace(old_ID, new_ID))
                 
@@ -91,8 +91,7 @@ def parse_alignment_info(ali_filename):
         ali_content -- string, name of the file provided as argument
     """
     ali_dict = {}
-    name_pattern = re.compile(r">.+_(\D+\|\w+.\w)")
-
+    name_pattern = re.compile(r">(\D+\|\w+.\w)")
     with open(ali_filename) as ali:
         for line in ali:
             if line.startswith(">"):
@@ -108,7 +107,7 @@ def parse_alignment_info(ali_filename):
         return ali_dict
 
 def get_ali_ID(ali_filename):
-    ID_pattern = re.compile(r".+(OG\d+).fa")
+    ID_pattern = re.compile(r".+(OG.+)._corr.fa")
     ID_match = ID_pattern.match(ali_filename)
     if ID_match:
         new_ID = ID_match.group(1)
@@ -122,10 +121,10 @@ if __name__ == "__main__":
     # Get input file names from cmd line arguments
     #xml_filename = get_xml_filename(argv)
     #ali_filename = get_ali_filename(argv)
-    ali_filename = "C:/Users/meeldurb/Google Drive/Master internship" \
-                    " phylogenetics salmonids/Salmonid_genomics_resources/" \
-                    "Orthologs_homeologs/orthogroups.03.06.2017/" \
-                    "Alignments/OG0008390.fa"
+    ali_filename = 'C:/Users/meeldurb/Dropbox/Melanie/' \
+                   'Master_internship_phylogenetics/' \
+                   'phylogenetics/Alignments_aa_corrected/' \
+                   'OG0008390_1._corr.fa'
     xml = "dummy_xml/secondary_constr_aa.xml"
     dup_filename = "C:/Users/meeldurb/Dropbox/Melanie/" \
                    "Beast_dating_salmonids/RData/20170801_" \
