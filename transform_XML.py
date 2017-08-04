@@ -113,7 +113,13 @@ def get_ali_ID(ali_filename):
         new_ID = ID_match.group(1)
     return new_ID
                                    
-                
+def parse_dup_table(dup_filename):
+    dup_dict = {}
+    with open(dup_filename) as dup_table:
+        for line in dup_table:
+            clan_id, Eluc, Ssal_1, Omyk_1, Ssal_2, Omyk_2 = line.strip().split(';')
+            dup_dict[clan_id] = [Eluc, Ssal_1, Omyk_1, Ssal_2, Omyk_2]
+        return dup_dict
 
 
 
@@ -124,13 +130,15 @@ if __name__ == "__main__":
     ali_filename = 'C:/Users/meeldurb/Dropbox/Melanie/' \
                    'Master_internship_phylogenetics/' \
                    'phylogenetics/Alignments_aa_corrected/' \
-                   'OG0008390_1._corr.fa'
+                   'OG0008392_1._corr.fa'
     xml = "dummy_xml/secondary_constr_aa.xml"
     dup_filename = "C:/Users/meeldurb/Dropbox/Melanie/" \
                    "Beast_dating_salmonids/RData/20170801_" \
                    "duplicate_clans_filtered_aa.csv"
-    parse_into_xml(xml, ali_filename)
-    ali = parse_alignment_info(ali_filename)
+    dupdict = parse_dup_table(dup_filename)
+    print dupdict
+    #parse_into_xml(xml, ali_filename)
+    #ali = parse_alignment_info(ali_filename)
     #print ali
     
     
