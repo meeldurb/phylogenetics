@@ -45,17 +45,28 @@ def get_duplicates_filename(argv):
     dup_filename = argv[3]
     return dup_filename
 
-def parse_into_xml(xml_filename, ali_filename):
+def parse_into_xml(xml_filename, ali_filename, dup_filename):
     full_seq_new = ''
     ID_pattern = re.compile(r'(OG\d+)')
     new_ID = get_ali_ID(ali_filename)
     seq_pattern = re.compile(r'(\s+<sequence id="seq_)(.+)("\s+taxon=")(.+)' \
                              '("\s* totalcount="\d+)(" value=")(.*)("\/>)')
+    MG1_1_pattern = re.compile(r'(\s+<taxon id=")(Omyk_Omyk\|Gene\.308644)(" spec="Taxon"\/>)')
+    MG1_2_pattern = re.compile(r'(\s+<taxon id=")(Ssal_Ssal\|XP_014017858\.1)(" spec="Taxon"\/>)') 
+    MG2_1_pattern = re.compile(r'(\s+<taxon id=")(Omyk_Omyk\|Gene\.332400)(" spec="Taxon"\/>)') 
+    MG2_2_pattern = re.compile(r'(\s+<taxon id=")(Ssal_Ssal\|XP_014069666\.1)(" spec="Taxon"\/>)')
+    dup_table = parse_dup_table(dup_filename)
+    dup_ID = dup_table[str(new_ID)]
+    print dup_ID
     with open(xml_filename, "rt") as xml_in:
         with open("xml_out.xml", "wt") as xml_out:
             for line in xml_in:
                 seq_match = seq_pattern.match(line)
                 ID_match = ID_pattern.search(line)
+                MG1_1_match = MG1_1_pattern.match(line)
+                MG1_2_match = MG1_2_pattern.match(line)
+                MG2_1_match = MG2_1_pattern.match(line)
+                MG2_2_match = MG2_2_pattern.match(line)
                 if seq_match:
                     s_beg = seq_match.group(1)
                     s_name = seq_match.group(2)
@@ -72,9 +83,19 @@ def parse_into_xml(xml_filename, ali_filename):
                         
                     xml_out.write(s_beg.replace(s_beg, full_seq_new))
                     full_seq_new = ''
-                
+                elif MG1_1_match:
+                    p_name = MG1_1_match.group(2)
+                    xml_out.write(line.replace(p_name, dup_ID[2]))
+                elif MG1_2_match:
+                    p_name = MG1_2_match.group(2)
+                    xml_out.write(line.replace(p_name, dup_ID[1]))
+                elif MG2_1_match:
+                    p_name = MG2_1_match.group(2)
+                    xml_out.write(line.replace(p_name, dup_ID[4]))
+                elif MG2_2_match:
+                    p_name = MG2_2_match.group(2)
+                    xml_out.write(line.replace(p_name, dup_ID[3]))
                 elif ID_match:
-                    #print line, "match"
                     old_ID = ID_match.group(1)
                     xml_out.write(line.replace(old_ID, new_ID))
                 
@@ -107,7 +128,7 @@ def parse_alignment_info(ali_filename):
         return ali_dict
 
 def get_ali_ID(ali_filename):
-    ID_pattern = re.compile(r".+(OG\d+_\d+)._corr.fa")
+    ID_pattern = re.compile(r".+(OG\d+_\d+.)_corr.fa")
     ID_match = ID_pattern.match(ali_filename)
     if ID_match:
         new_ID = ID_match.group(1)
@@ -123,6 +144,30 @@ def parse_dup_table(dup_filename):
 
 
 
+##def group_by_heading(xml_filename):
+##    buffer = []
+##    for line in xml_filename:
+##        if line.startswith('                <taxonset id="monophyletic_group_1"'):
+##            if buffer:
+##                #yield buffer
+##                buffer = [line]
+##        else:
+##            buffer.append(line)
+##        yield buffer
+##
+##def try_out(xml_filename):
+##    with open(xml_filename, 'r') as source:
+##        for heading_and_lines in group_by_heading(source):
+##            #print heading_and_lines
+##            heading = heading_and_lines[0]
+##            lines = heading_and_lines[1:3]
+##        print heading
+##        print lines
+##        
+            
+
+    
+
 if __name__ == "__main__":
     # Get input file names from cmd line arguments
     #xml_filename = get_xml_filename(argv)
@@ -136,9 +181,10 @@ if __name__ == "__main__":
                    "Beast_dating_salmonids/RData/20170801_" \
                    "duplicate_clans_filtered_aa.csv"
     dupdict = parse_dup_table(dup_filename)
-    print dupdict
-    #parse_into_xml(xml, ali_filename)
+    #print len(dupdict)
+    #print dupdict
+    parse_into_xml(xml, ali_filename, dup_filename)
     #ali = parse_alignment_info(ali_filename)
     #print ali
-    
+
     
