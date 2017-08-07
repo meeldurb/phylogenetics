@@ -12,31 +12,12 @@
 ##_____ load libraries and functions _____##
 #------------------------------------------#
 
-install.packages("ape", repos = "http://cran.rstudio.com/")
-install.packages("phangorn", repos = "http://cran.rstudio.com/")
-install.packages("plyr", repos = "http://cran.rstudio.com/")
+install.packages("Rcurl", repos = "http://cran.rstudio.com/")
 install.packages("seqinr", repos = "http://cran.rstudio.com/")
 
-library("ape")
-library("phangorn")
-library("plyr")
 require("seqinr")
 library("RCurl")
 
-# clanfinder function
-eval(parse(text = getURL(paste("https://raw.githubusercontent.com/",
-                               "srsand/Phylogenomics/master/clanfinder.R", 
-                               sep = ""), ssl.verifypeer = FALSE)))
-
-# phylo functions
-eval(parse(text = getURL(paste("https://raw.githubusercontent.com/",
-                               "srsand/Phylogenomics/master/Phylo_functions.R", 
-                               sep = ""), ssl.verifypeer = FALSE)))
-
-# autoroot function
-eval(parse(text = getURL(paste("https://raw.githubusercontent.com/",
-                               "srsand/Phylogenomics/master/auto.root_salmonid_clans.R", 
-                               sep = ""), ssl.verifypeer = FALSE)))
 
 # loadRData in variable function
 eval(parse(text = getURL(paste("https://raw.githubusercontent.com/",
@@ -61,19 +42,6 @@ alignment.files <- dir(paste('C:/Users/meeldurb/Google Drive/',
                              'Salmonid_genomics_resources/Orthologs_homeologs/',
                              'orthogroups.03.06.2017/Alignments/', sep = ''), 
                        full.names = T)
-
-
-# xml file we need to import the alingment in
-xml <- readLines(paste('C:/Users/meeldurb/Dropbox/Melanie/',
-                       'Master_internship_phylogenetics/', 
-                       'phylogenetics/dummy_xml/secondary_constr_aa.xml', sep = ''))
-
-
-# Table with duplicate pairs
-dup_cluster_phylofilt <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
-                                         'Beast_dating_salmonids/RData/',
-                                         '20170801_duplicate_clans_filtered_aa.RData', 
-                                         sep = ''))
 
 # table with Omyk gene and protein names
 Omyk.prot2gene = read.table(paste('C:/users/meeldurb/Google Drive/', 
