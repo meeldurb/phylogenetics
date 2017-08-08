@@ -11,6 +11,7 @@ for each OG alignment.
 
 from sys import argv
 import re
+import os
 
 def get_xml_filename(argv):
     """ Returns the xml filename from the command line
@@ -62,7 +63,10 @@ def parse_into_xml(xml_filename, ali_filename, dup_filename):
     
     dup_table = parse_dup_table(dup_filename)
     dup_ID = dup_table[str(new_ID)]
-    xml_out_filename = new_ID + "xml"
+    newdir = 'xml_outfiles/'
+    if not os.path.exists(newdir):
+        os.makedirs(newdir)
+    xml_out_filename = newdir + new_ID + "xml"
     with open(xml_filename, "rt") as xml_in:
         with open(xml_out_filename, "wt") as xml_out:
             for line in xml_in:
@@ -199,7 +203,7 @@ if __name__ == "__main__":
     # Get input file names from cmd line arguments
     xml_filename = get_xml_filename(argv)
     ali_filename = get_ali_filename(argv)
-    dup_filename = get_get_duplicates_filename(argv)
+    dup_filename = get_duplicates_filename(argv)
 ##    #ali_filename = 'C:/Users/meeldurb/Dropbox/Melanie/' \
 ##                   'Master_internship_phylogenetics/' \
 ##                   'phylogenetics/Alignments_aa_corrected/' \
@@ -209,7 +213,7 @@ if __name__ == "__main__":
 ##                   "Beast_dating_salmonids/RData/20170801_" \
 ##                   "duplicate_clans_filtered_aa.csv"
     dupdict = parse_dup_table(dup_filename)
-    parse_into_xml(xml, ali_filename, dup_filename)
+    parse_into_xml(xml_filename, ali_filename, dup_filename)
 
 
     
