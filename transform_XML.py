@@ -197,21 +197,19 @@ def parse_dup_table(dup_filename):
 
 if __name__ == "__main__":
     # Get input file names from cmd line arguments
-    #xml_filename = get_xml_filename(argv)
-    #ali_filename = get_ali_filename(argv)
-    ali_filename = 'C:/Users/meeldurb/Dropbox/Melanie/' \
-                   'Master_internship_phylogenetics/' \
-                   'phylogenetics/Alignments_aa_corrected/' \
-                   'OG0008392_1._corr.fa'
-    xml = "dummy_xml/secondary_constr_aa.xml"
-    dup_filename = "C:/Users/meeldurb/Dropbox/Melanie/" \
-                   "Beast_dating_salmonids/RData/20170801_" \
-                   "duplicate_clans_filtered_aa.csv"
+    xml_filename = get_xml_filename(argv)
+    ali_filename = get_ali_filename(argv)
+    dup_filename = get_get_duplicates_filename(argv)
+##    #ali_filename = 'C:/Users/meeldurb/Dropbox/Melanie/' \
+##                   'Master_internship_phylogenetics/' \
+##                   'phylogenetics/Alignments_aa_corrected/' \
+##                   'OG0008392_1._corr.fa'
+##    xml = "dummy_xml/secondary_constr_aa.xml"
+##    dup_filename = "C:/Users/meeldurb/Dropbox/Melanie/" \
+##                   "Beast_dating_salmonids/RData/20170801_" \
+##                   "duplicate_clans_filtered_aa.csv"
     dupdict = parse_dup_table(dup_filename)
-    #print len(dupdict)
-    #print dupdict
     parse_into_xml(xml, ali_filename, dup_filename)
-    #ali = parse_alignment_info(ali_filename)
-    #print ali
+
 
     
