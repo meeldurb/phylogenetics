@@ -47,14 +47,19 @@ def get_duplicates_filename(argv):
 
 def parse_into_xml(xml_filename, ali_filename, dup_filename):
     full_seq_new = ''
+    MG3_1_lines = ''
+    MG3_2_lines = ''
     ID_pattern = re.compile(r'(OG\d+)')
     new_ID = get_ali_ID(ali_filename)
     seq_pattern = re.compile(r'(\s+<sequence id="seq_)(.+)("\s+taxon=")(.+)' \
                              '("\s* totalcount="\d+)(" value=")(.*)("\/>)')
-    MG1_1_pattern = re.compile(r'(\s+<taxon id=")(Omyk_Omyk\|Gene\.308644)(" spec="Taxon"\/>)')
-    MG1_2_pattern = re.compile(r'(\s+<taxon id=")(Ssal_Ssal\|XP_014017858\.1)(" spec="Taxon"\/>)') 
-    MG2_1_pattern = re.compile(r'(\s+<taxon id=")(Omyk_Omyk\|Gene\.332400)(" spec="Taxon"\/>)') 
-    MG2_2_pattern = re.compile(r'(\s+<taxon id=")(Ssal_Ssal\|XP_014069666\.1)(" spec="Taxon"\/>)')
+    MG1_1_pattern = re.compile(r'(\s+<taxon id=")(Omyk1)(" spec="Taxon"\/>)')
+    MG1_2_pattern = re.compile(r'(\s+<taxon id=")(Ssal1)(" spec="Taxon"\/>)') 
+    MG2_1_pattern = re.compile(r'(\s+<taxon id=")(Omyk2)(" spec="Taxon"\/>)') 
+    MG2_2_pattern = re.compile(r'(\s+<taxon id=")(Ssal2)(" spec="Taxon"\/>)')
+    MG3_1_pattern = re.compile(r'(\s+<taxon id=")(Eluc1)(" spec="Taxon"\/>)')
+    MG3_2_pattern = re.compile(r'(\s+<taxon idref=")(Ssal3)("\/>)')
+    
     dup_table = parse_dup_table(dup_filename)
     dup_ID = dup_table[str(new_ID)]
     print dup_ID
@@ -67,6 +72,8 @@ def parse_into_xml(xml_filename, ali_filename, dup_filename):
                 MG1_2_match = MG1_2_pattern.match(line)
                 MG2_1_match = MG2_1_pattern.match(line)
                 MG2_2_match = MG2_2_pattern.match(line)
+                MG3_1_match = MG3_1_pattern.match(line)
+                MG3_2_match = MG3_2_pattern.match(line)
                 if seq_match:
                     s_beg = seq_match.group(1)
                     s_name = seq_match.group(2)
@@ -77,6 +84,7 @@ def parse_into_xml(xml_filename, ali_filename, dup_filename):
                     s_ali = seq_match.group(7)
                     s_end = seq_match.group(8)
                     for ali_name, ali_seq in parse_alignment_info(ali_filename).iteritems():
+                        print ali_name
                         # add the alignment lines into a variable
                         full_seq_new += s_beg + ali_name + s_tax + ali_name + s_count + s_val + \
                                         ali_seq + s_end + '\n'
@@ -95,10 +103,30 @@ def parse_into_xml(xml_filename, ali_filename, dup_filename):
                 elif MG2_2_match:
                     p_name = MG2_2_match.group(2)
                     xml_out.write(line.replace(p_name, dup_ID[3]))
+                elif MG3_1_match:
+                    p_beg = MG3_1_match.group(1)
+                    p_name = MG3_1_match.group(2)
+                    p_end = MG3_1_match.group(3)
+                    for ali_name in parse_alignment_info(ali_filename):
+                        spec_name = ali_name.split("|")[0]
+                        if spec_name == "Eluc" or spec_name == "Okis" or spec_name == "Tthy":
+                            MG3_1_lines += p_beg + ali_name + p_end + '\n'
+                    xml_out.write(p_beg.replace(p_beg, MG3_1_lines))
+                    MG3_lines = ''
+                elif MG3_2_match:
+                    p_beg = MG3_2_match.group(1)
+                    p_name = MG3_2_match.group(2)
+                    p_end = MG3_2_match.group(3)
+                    for ali_name in parse_alignment_info(ali_filename):
+                        spec_name = ali_name.split("|")[0]
+                        if spec_name == "Omyk" or spec_name == "Ssal":
+                            MG3_2_lines += p_beg + ali_name + p_end + '\n'
+                    xml_out.write(p_beg.replace(p_beg, MG3_2_lines))
+                    MG3_lines = ''
                 elif ID_match:
                     old_ID = ID_match.group(1)
                     xml_out.write(line.replace(old_ID, new_ID))
-                
+
                 else:
                     xml_out.write(line)
                 
