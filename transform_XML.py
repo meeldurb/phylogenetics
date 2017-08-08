@@ -62,9 +62,9 @@ def parse_into_xml(xml_filename, ali_filename, dup_filename):
     
     dup_table = parse_dup_table(dup_filename)
     dup_ID = dup_table[str(new_ID)]
-    print dup_ID
+    xml_out_filename = new_ID + "xml"
     with open(xml_filename, "rt") as xml_in:
-        with open("xml_out.xml", "wt") as xml_out:
+        with open(xml_out_filename, "wt") as xml_out:
             for line in xml_in:
                 seq_match = seq_pattern.match(line)
                 ID_match = ID_pattern.search(line)
@@ -84,7 +84,6 @@ def parse_into_xml(xml_filename, ali_filename, dup_filename):
                     s_ali = seq_match.group(7)
                     s_end = seq_match.group(8)
                     for ali_name, ali_seq in parse_alignment_info(ali_filename).iteritems():
-                        print ali_name
                         # add the alignment lines into a variable
                         full_seq_new += s_beg + ali_name + s_tax + ali_name + s_count + s_val + \
                                         ali_seq + s_end + '\n'
