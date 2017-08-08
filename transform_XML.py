@@ -143,7 +143,7 @@ def parse_alignment_info(ali_filename):
         ali_content -- string, name of the file provided as argument
     """
     ali_dict = {}
-    name_pattern = re.compile(r">(\D+\|\w+.\w)")
+    name_pattern = re.compile(r">(\D+\|\w+.\w+)")
     with open(ali_filename) as ali:
         for line in ali:
             if line.startswith(">"):
@@ -204,15 +204,15 @@ if __name__ == "__main__":
     xml_filename = get_xml_filename(argv)
     ali_filename = get_ali_filename(argv)
     dup_filename = get_duplicates_filename(argv)
-##    #ali_filename = 'C:/Users/meeldurb/Dropbox/Melanie/' \
+##    ali_filename = 'C:/Users/meeldurb/Dropbox/Melanie/' \
 ##                   'Master_internship_phylogenetics/' \
 ##                   'phylogenetics/Alignments_aa_corrected/' \
 ##                   'OG0008392_1._corr.fa'
-##    xml = "dummy_xml/secondary_constr_aa.xml"
+##    xml_filename = "dummy_xml/secondary_constr_aa.xml"
 ##    dup_filename = "C:/Users/meeldurb/Dropbox/Melanie/" \
 ##                   "Beast_dating_salmonids/RData/20170801_" \
 ##                   "duplicate_clans_filtered_aa.csv"
-    dupdict = parse_dup_table(dup_filename)
+    #dupdict = parse_dup_table(dup_filename)
     parse_into_xml(xml_filename, ali_filename, dup_filename)
 
 
