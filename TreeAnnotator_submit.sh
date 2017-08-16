@@ -8,11 +8,13 @@
 module load beast2/2.4.3
 
 
+BURNIN=$1
 INPUT=$(ls $HOME/BEAST_results/*.Tree.trees.txt | awk 'NR=='$SLURM_ARRAY_TASK_ID'')
 OUTDIR=$HOME/TreeAnnotator_results
-OUTPUT=$(basename $INPUT).tre
+OUTPUT=$(basename $INPUT .Tree.trees.txt).tre
+
 
 cd $OUTDIR
 
-treeannotator $INPUT $OUTDIR/$OUTPUT
+treeannotator -burnin $BURNIN -heights mean $INPUT $OUTDIR/$OUTPUT
 
