@@ -43,9 +43,9 @@ eval(parse(text = getURL(paste("https://raw.githubusercontent.com/",
 
 
 
-#-------------------------------------------------#
-##____ make clans from orthogroup trees ____##
-#-------------------------------------------------#
+#----------------------------------------------#
+# ____ make clans from orthogroup trees ______ #
+#----------------------------------------------#
 
 # 1) load orthotrees
 
@@ -56,6 +56,20 @@ OG_trees <- loadRData(paste('C:/Users/meeldurb/Google Drive/Master internship ',
                     'Orthologs_homeologs/orthogroups.03.06.2017/',
                     'OG_trees.30.05.2017.RData', sep = ''))
 
+OG_trees2 <- loadRData(paste('C:/Users/meeldurb/Google Drive/Master internship ',
+                            'phylogenetics salmonids/Salmonid_genomics_resources/',
+                            'Orthologs_homeologs/orthogroups_2017/',
+                            'OG_trees+clans.06.08.2017.RData', sep = ''))
+
+OG_trees3 <- loadRData(paste('C:/Users/meeldurb/Google Drive/Master internship ',
+                             'phylogenetics salmonids/Salmonid_genomics_resources/',
+                             'Orthologs_homeologs/orthogroups_2017/',
+                             'OG_clan_trees.06.08.2017.RData', sep = ''))
+
+OG_trees4 <- loadRData(paste('C:/Users/meeldurb/Google Drive/Master internship ',
+                             'phylogenetics salmonids/Salmonid_genomics_resources/',
+                             'Orthologs_homeologs/orthogroups_2017/',
+                             'OG_clan_table.06.08.2017.RData', sep = ''))
 # total number of orthogroups
 length(OG_trees) 
 # summing up the number of specific species in the trees
