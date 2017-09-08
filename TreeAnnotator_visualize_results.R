@@ -52,25 +52,24 @@ trees = dir(paste('C:/Users/meeldurb/Dropbox/Melanie/',
 beast.trees <- lapply(trees, read.beast)
 plot(beast.tr[[1]])
 
-
+#beast.trees2 <- beast.trees[1:5]
 #---------------------------#
 ##_____ Ss4R distance _____##
 #---------------------------#
 
+# remove the trees without branchlengths
+for (i in 1:length(beast.trees)){
+  #print (tree)
+  #i <- sum(i, 1)
+  print(i)
+  if (is.na(beast.trees[[i]]$rate[2])){
+    beast.trees[[i]] <- NA
+    }
+}
 
-# # remove the trees without branchlengths
-# all.trees <- NULL
-# for (i in 1:length(beast.trees)){
-#   #print (tree)
-#   #i <- sum(i, 1)
-#   print(i)
-#   if (is.na(beast.trees[[i]]$rate[1])){
-#     beast.trees[[i]] <- NULL
-#     } 
-# }
+all.trees <- beast.trees[!is.na(beast.trees)]
 
-all.trees <- beast.trees
-# 
+
 # plot(all.trees[[2]])
 # nodelabels()
 # tiplabels()
@@ -89,29 +88,38 @@ height.pos <- sapply(Ss4R.nodes, function(i){
   }) 
 
 
+# get all the node age estimates
+# and the salmon duplicates
+
 Ss4R.nodeage.est <- NULL
 Ss4R.nodeage.min <- NULL
 Ss4R.nodeage.max <- NULL
+ssal.dup1 <- NULL
+ssal.dup2 <- NULL
+
 i <- 0
 for (pos in height.pos){
   #cat(pos, "\n")
   i <- sum(i, 1)
   Ss4R.nodeage.est <- c(Ss4R.nodeage.est, all.trees[[i]]$height[pos])
-  print(i)
-  print(all.trees[[i]]$height[pos])
   Ss4R.nodeage.min <- c(Ss4R.nodeage.min, all.trees[[i]]$`height_95%_HPD_MIN`[pos])
-  print(i)
-  print(all.trees[[i]]$`height_95%_HPD_MIN`[pos])
   Ss4R.nodeage.max <- c(Ss4R.nodeage.max, all.trees[[i]]$`height_95%_HPD_MAX`[pos])
-  print(i)
-  print(all.trees[[i]]$`height_95%_HPD_MAX`[pos])
+  # find salmon dups in the tree
+  salmon.tips <- which(substr(all.trees[[i]]$tip.label, 1, 4) == 'Ssal')
+  salmon.dups <- substr(all.trees[[i]]$tip.label[salmon.tips], 6, 1000)
+  ssal.dup1 <- c(ssal.dup1, salmon.dups[1])
+  ssal.dup2 <- c(ssal.dup2, salmon.dups[2])
+  
 }
 
-# remove trees with no heights
-Ss4R.nodeage.est[Ss4R.nodeage.est == 0] <- NA
-Ss4R.nodeage.est <- Ss4R.nodeage.est[!is.na(Ss4R.nodeage.est)]
+
      
-nodeages.Ss4R <- as.data.frame(cbind(Ss4R.nodeage.est, Ss4R.nodeage.max, Ss4R.nodeage.min))
+nodeages.Ss4R <- as.data.frame(cbind(Ss4R.nodeage.est, Ss4R.nodeage.max, Ss4R.nodeage.min,
+                                     ssal.dup1, ssal.dup2))
+colnames(nodeages.Ss4R) <- c('estimate', 'max', 'min', 'ssal1', 'ssal2')
+
+write.table(nodeages.Ss4R, file = "nodeages_Ss4r.csv", append = F, 
+            sep = ";", quote = F, col.names = T, row.names = F)
 
 
 
