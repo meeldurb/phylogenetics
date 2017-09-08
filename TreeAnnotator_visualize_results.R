@@ -57,25 +57,61 @@ plot(beast.tr[[1]])
 ##_____ Ss4R distance _____##
 #---------------------------#
 
-# find duplicates
 
+# # remove the trees without branchlengths
+# all.trees <- NULL
+# for (i in 1:length(beast.trees)){
+#   #print (tree)
+#   #i <- sum(i, 1)
+#   print(i)
+#   if (is.na(beast.trees[[i]]$rate[1])){
+#     beast.trees[[i]] <- NULL
+#     } 
+# }
 
-tree <- beast.trees[[1]]
-plot(tree)
-
-nodelabels()
-tiplabels()
+all.trees <- beast.trees
+# 
+# plot(all.trees[[2]])
+# nodelabels()
+# tiplabels()
 
 # find Omyk and Ssal in the tip labels and get MRCA 
-Ss4R.node <- getMRCA(tree, c(substr(tree$tip.label, 1, 4) == 'Ssal', 
-                             substr(tree$tip.label, 1, 4) == 'Omyk'))
+Ss4R.nodes <- sapply(all.trees, function(i){
+  getMRCA(i, c(substr(i$tip.label, 1, 4) == 'Ssal', 
+               substr(i$tip.label, 1, 4) == 'Omyk'))
+  })
 
 
 # get node age of the Ss4R node
-height.pos <- Ss4R.node - length(tree$tip.label)
-Ss4R.nodeage.est <- tree$height[height.pos]
-Ss4R.nodeage.min <- tree$`height_95%_HPD_MIN`[height.pos]
-Ss4R.nodeage.max <- tree$`height_95%_HPD_MAX`[height.pos]
+height.pos <- sapply(Ss4R.nodes, function(i){
+  i }) - sapply(all.trees, function(i){
+  length(i$tip.label) 
+  }) 
+
+
+Ss4R.nodeage.est <- NULL
+Ss4R.nodeage.min <- NULL
+Ss4R.nodeage.max <- NULL
+i <- 0
+for (pos in height.pos){
+  #cat(pos, "\n")
+  i <- sum(i, 1)
+  Ss4R.nodeage.est <- c(Ss4R.nodeage.est, all.trees[[i]]$height[pos])
+  print(i)
+  print(all.trees[[i]]$height[pos])
+  Ss4R.nodeage.min <- c(Ss4R.nodeage.min, all.trees[[i]]$`height_95%_HPD_MIN`[pos])
+  print(i)
+  print(all.trees[[i]]$`height_95%_HPD_MIN`[pos])
+  Ss4R.nodeage.max <- c(Ss4R.nodeage.max, all.trees[[i]]$`height_95%_HPD_MAX`[pos])
+  print(i)
+  print(all.trees[[i]]$`height_95%_HPD_MAX`[pos])
+}
+
+# remove trees with no heights
+Ss4R.nodeage.est[Ss4R.nodeage.est == 0] <- NA
+Ss4R.nodeage.est <- Ss4R.nodeage.est[!is.na(Ss4R.nodeage.est)]
+     
+nodeages.Ss4R <- as.data.frame(cbind(Ss4R.nodeage.est, Ss4R.nodeage.max, Ss4R.nodeage.min))
 
 
 
