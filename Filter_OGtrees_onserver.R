@@ -317,12 +317,12 @@ OG_clans_dupl <- loadRData(paste('/mnt/users/melavan/RData/',
                                  sep = ''))
 
 
-print(paste("Number of OG_clans at start:", length(OG_clans), sep = ""))
-print(paste("Number of alignment files at start:", length(dir(fasta.files)), sep = ""))
-print(paste("OG clans number after standard filtering:", length(OG_clans_filt), sep = ""))
-print(paste("OG clans number after duplicate filtering:", 
+print(paste("Number of OG_clans at start: ", length(OG_clans), sep = ""))
+print(paste("Number of alignment files at start: ", length(dir(fasta.files)), sep = ""))
+print(paste("OG clans number after standard filtering: ", length(OG_clans_filt), sep = ""))
+print(paste("OG clans number after duplicate filtering: ", 
             length(OG_clans_dupl), sep = ""))
-print(paste("OG clans number after duplicate and Eluc filtering:", 
+print(paste("OG clans number after duplicate and Eluc filtering: ", 
             length(OG_clans_dupl_Eluc_filt), sep = ""))
 
 
