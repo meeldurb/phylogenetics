@@ -55,21 +55,6 @@ OG_trees <- loadRData(paste('C:/Users/meeldurb/Google Drive/Master internship ',
                     'phylogenetics salmonids/Salmonid_genomics_resources/',
                     'Orthologs_homeologs/orthogroups.03.06.2017/',
                     'OG_trees.30.05.2017.RData', sep = ''))
-
-OG_trees2 <- loadRData(paste('C:/Users/meeldurb/Google Drive/Master internship ',
-                            'phylogenetics salmonids/Salmonid_genomics_resources/',
-                            'Orthologs_homeologs/orthogroups_2017/',
-                            'OG_trees+clans.06.08.2017.RData', sep = ''))
-
-OG_trees3 <- loadRData(paste('C:/Users/meeldurb/Google Drive/Master internship ',
-                             'phylogenetics salmonids/Salmonid_genomics_resources/',
-                             'Orthologs_homeologs/orthogroups_2017/',
-                             'OG_clan_trees.06.08.2017.RData', sep = ''))
-
-OG_trees4 <- loadRData(paste('C:/Users/meeldurb/Google Drive/Master internship ',
-                             'phylogenetics salmonids/Salmonid_genomics_resources/',
-                             'Orthologs_homeologs/orthogroups_2017/',
-                             'OG_clan_table.06.08.2017.RData', sep = ''))
 # total number of orthogroups
 length(OG_trees) 
 # summing up the number of specific species in the trees
@@ -92,6 +77,8 @@ OG_clanfinder = lapply(OG_trees, clanFinder, ut = c('Olat', 'Gacu', 'Drer', 'Loc
 
 # some of the OG clans are empty, we need to remove these
 OG_clanfinder.filt <- OG_clanfinder[sapply(OG_clanfinder, length)>0]
+
+# rename the clans for each orthogroup
 clans.num <- as.numeric(unlist(sapply(OG_clanfinder.filt, function(i) 1:length(i))))
 OG_clans <- unlist(OG_clanfinder.filt, recursive = F)
 head(names(OG_clans))
@@ -101,7 +88,6 @@ head(names(OG_clans))
 # total clans
 length(OG_clans) 
 table(sapply(OG_clans, function(i) sum(c('Ssal', 'Omyk') %in% substr(i$tip.label, 1, 4))))
-
 
 
 
