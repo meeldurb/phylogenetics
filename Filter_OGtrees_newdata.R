@@ -135,18 +135,18 @@ fasta.files <- paste('C:/Users/meeldurb/Google Drive/',
 #fail.report <- NULL
 alignments = lapply(head(dir(fasta.files, full.names = T), n = 500), function(i){
   t = read.fasta(i) })
-  if(class(t)=='try-error') {
-    print(i)
-    #print(substr(i, 158, 169), "has an error")
-    #fail.report <- c(fail.report, paste(substr(i, 158, 169), "has an error", sep = ""))
-    return(NULL)
-  }
-  if(class(t)!='try-error') {
-    #print(substr(i, 158, 169), "was successfull")
-    #fail.report <- c(fail.report, paste(substr(i, 158, 169), "was successfull", sep = ""))
-    return(t)
-  }
-  })
+  # if(class(t)=='try-error') {
+  #   print(i)
+  #   #print(substr(i, 158, 169), "has an error")
+  #   #fail.report <- c(fail.report, paste(substr(i, 158, 169), "has an error", sep = ""))
+  #   return(NULL)
+  # }
+  # if(class(t)!='try-error') {
+  #   #print(substr(i, 158, 169), "was successfull")
+  #   #fail.report <- c(fail.report, paste(substr(i, 158, 169), "was successfull", sep = ""))
+  #   return(t)
+  # }
+  # })
 
 # change names of the alignments. Remove .aln
 names(alignments) <- sub('aln', '', head(dir(fasta.files), n = 500))
@@ -340,5 +340,13 @@ OG_clans_dupl <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
                                  '20170913-Clans_forBEAST_dupssandElucfilt_nt.RData', 
                                  sep = ''))
 
+
+print(paste("Number of OG_clans at start:", length(OG_clans), sep = ""))
+print(paste("Number of alignment files at start:", length(dir(fasta.files)), sep = ""))
+print(paste("OG clans number after standard filtering:", length(OG_clans_filt), sep = ""))
+print(paste("OG clans number after duplicate filtering:", 
+            length(OG_clans_dupl), sep = ""))
+print(paste("OG clans number after duplicate and Eluc filtering:", 
+            length(OG_clans_dupl_Eluc_filt), sep = ""))
 
 
