@@ -117,7 +117,7 @@ head(dir(fasta.files, full.names = T))
 
 # read the alignments in memory
 #fail.report <- NULL
-alignments = lapply(head(dir(fasta.files, full.names = T), n = 500), function(i){
+alignments = lapply(dir(fasta.files, full.names = T), function(i){
  t = read.fasta(i)})
   # if(class(t)=='try-error') {
   #   print(i)
@@ -133,7 +133,7 @@ alignments = lapply(head(dir(fasta.files, full.names = T), n = 500), function(i)
   # })
 
 # change names of the alignments. Remove .aln
-names(alignments) <- sub('aln', '', head(dir(fasta.files), n = 500))
+names(alignments) <- sub('aln', '', dir(fasta.files))
 head(alignments, n = 2)
 
 # extract the duplicated alignments
