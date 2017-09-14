@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><beast beautitemplate='Standard' beautistatus='' namespace="beast.core:beast.evolution.alignment:beast.evolution.tree.coalescent:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.likelihood" required="" version="2.4">
+
+
+    <data
+id="OG0000301_1."
+name="alignment">
+                    <sequence id="seq_Ssal|XP_014022818.1" taxon="Ssal|XP_014022818.1" totalcount="20" value="ATGCTGCTCTCTGTACCGCCAAGGGCAGATATCAATCCATACATCGGCTATAACAGCAGAAACAGCAAA------------AAGCAGTCATATGTGTCCTCCGGCCACCAGATGGCACCCCCCAGTCCCAACACCAACAGCAGCAGCAACAGCAGTGTCGGGGGAGTGGAACAGCTGAGTAAAACTAACCTGTACATCCGCGGTCTTCACCCCGGGACGACAGACCAGGACCTGGTCAAGCTA---------------------TGC------CAGCCG---------------------------------TATGGGAAGATTGTTTCCACCAAGGCCATCCTGGACAAAACCACCAACAAGTGCAAAGGCTATGGCTTTGTGGACTTTGACAGTCCGACAGCGGCCCAGAAAGCAGTGACCGCCCTGAAGTCCAGTGGTGCCCAGGCTCAAATGGCCAAGCAACAGGAGCAGGACCCCACCAACCTGTACATCTCCAACCTCCCTGTGTCCATGGACGAGCAGGAGCTGGAGAGCATGCTCAAGTCCTTCGGCCAGGTCATCTCCACACGCATCCTCCGCGATGCCAACGGGATCAGCCGTGGCGTTGGCTTCGCCAGGATGGAGTCCACAGAGAAGTGTGAAGCCATTATTCAACATTTTAATGGCAAATTCATTAAGACTCCACCAGGAGTTCCA---------------------------------------------------------GTGCCCCCTGAACCATTATTGTGCAAGTTTGCAGACGGGGGACAGAAAAAGAGGCAGAACCAGGGGAAGTACCTTCAGAATGGCAGGCCCTGGGCCAGGGATGGAGAGATGGGAGGGATGACGCTAGCATATGACCCCACAGCCTTACAGAATGGGTTCTATTCGTCACCCTACGGTCTGACCCCAAACCGGATGATCGCCCAGACATCCCTCTCTCCCTACATGCATTCACCCATCTCATCCTTCCAGCTACATAGTCCCTCCTGGATGCACCACCAGTCGTACCTCATGCAGCCTGCAGGCACAGTCCTGACTCCGACCATGGACCATGCCATGTCCATCCAGCCCACCTCCATGATGGGCACCATGACCCAGCAGCTCAGCCACCTATCCCTGGGCAGCACGGGCACG---------------------------------------------------TTTATGCCTGCCAACACAACTATGCAGGGGACATACATCCCCCAGTACCAACCAGTGCCTCCCTCCAGTGTCCCTGTAGAG------------------------------------------------------GAGAACGGAGGACAACAGCAACAGGTTGCTATGGAGACACCTGCAGAACACACAAACTACTCATACCAGCACACCAAGTGA"/>
+                </data>
+
+
+    
+
+
+    
+
+
+    
+<map name="Uniform" >beast.math.distributions.Uniform</map>
+<map name="Exponential" >beast.math.distributions.Exponential</map>
+<map name="LogNormal" >beast.math.distributions.LogNormalDistributionModel</map>
+<map name="Normal" >beast.math.distributions.Normal</map>
+<map name="Beta" >beast.math.distributions.Beta</map>
+<map name="Gamma" >beast.math.distributions.Gamma</map>
+<map name="LaplaceDistribution" >beast.math.distributions.LaplaceDistribution</map>
+<map name="prior" >beast.math.distributions.Prior</map>
+<map name="InverseGamma" >beast.math.distributions.InverseGamma</map>
+<map name="OneOnX" >beast.math.distributions.OneOnX</map>
+
+
+<run id="mcmc" spec="MCMC" chainLength="10000000" preBurnin="5">
+    <state id="state" storeEvery="5000">
+        <tree id="Tree.t:OG0000301_1.Tree" name="stateNode">
+            <taxonset id="TaxonSet.OG0000301_1." spec="TaxonSet">
+                <alignment idref="OG0000301_1."/>
+            </taxonset>
+        </tree>
+        <parameter id="birthRate.t:OG0000301_1.Tree" name="stateNode">1.0</parameter>
+        <parameter id="ucldStdev.c:OG0000301_1.Clock" lower="0.0" name="stateNode">0.1</parameter>
+        <stateNode id="rateCategories.c:OG0000301_1.Clock" spec="parameter.IntegerParameter" dimension="22">1</stateNode>
+        <parameter id="ucldMean.c:OG0000301_1.Clock" name="stateNode">1.0</parameter>
+    </state>
+
+    <init id="RandomTree.t:OG0000301_1.Tree" spec="beast.evolution.tree.RandomTree" estimate="false" initial="@Tree.t:OG0000301_1.Tree" taxa="@OG0000301_1.">
+        <populationModel id="ConstantPopulation0.t:OG0000301_1.Tree" spec="ConstantPopulation">
+            <parameter id="randomPopSize.t:OG0000301_1.Tree" name="popSize">1.0</parameter>
+        </populationModel>
+    </init>
+
+    <distribution id="posterior" spec="util.CompoundDistribution">
+        <distribution id="prior" spec="util.CompoundDistribution">
+            <distribution id="YuleModel.t:OG0000301_1.Tree" spec="beast.evolution.speciation.YuleModel" birthDiffRate="@birthRate.t:OG0000301_1.Tree" tree="@Tree.t:OG0000301_1.Tree"/>
+            <prior id="YuleBirthRatePrior.t:OG0000301_1.Tree" name="distribution" x="@birthRate.t:OG0000301_1.Tree">
+                <Uniform id="Uniform.1" name="distr" upper="Infinity"/>
+            </prior>
+            <prior id="MeanRatePrior.c:OG0000301_1.Clock" name="distribution" x="@ucldMean.c:OG0000301_1.Clock">
+                <Uniform id="Uniform.3" name="distr" upper="Infinity"/>
+            </prior>
+            <prior id="ucldStdevPrior.c:OG0000301_1.Clock" name="distribution" x="@ucldStdev.c:OG0000301_1.Clock">
+                <Gamma id="Gamma.0" name="distr">
+                    <parameter id="RealParameter.2" estimate="false" name="alpha">0.5396</parameter>
+                    <parameter id="RealParameter.3" estimate="false" name="beta">0.3819</parameter>
+                </Gamma>
+            </prior>
+            <distribution id="monophyletic_group_1.prior" spec="beast.math.distributions.MRCAPrior" tree="@Tree.t:OG0000301_1.Tree">
+                <taxonset id="monophyletic_group_1" spec="TaxonSet">
+                    <taxon id="Omyk1" spec="Taxon"/>
+                    <taxon id="Ssal1" spec="Taxon"/>
+                </taxonset>
+                <Normal id="Normal.0" name="distr">
+                    <parameter id="RealParameter.6" estimate="false" name="mean">21.0</parameter>
+                    <parameter id="RealParameter.7" estimate="false" name="sigma">1.0</parameter>
+                </Normal>
+            </distribution>
+            <distribution id="monophyletic_group_2.prior" spec="beast.math.distributions.MRCAPrior" tree="@Tree.t:OG0000301_1.Tree">
+                <taxonset id="monophyletic_group_2" spec="TaxonSet">
+                    <taxon id="Omyk2" spec="Taxon"/>
+                    <taxon id="Ssal2" spec="Taxon"/>
+                </taxonset>
+                <Normal id="Normal.1" name="distr">
+                    <parameter id="RealParameter.8" estimate="false" name="mean">0.0</parameter>
+                    <parameter id="RealParameter.9" estimate="false" name="sigma">1.0</parameter>
+                </Normal>
+            </distribution>
+            <distribution id="salmonids_pike_divergence.prior" spec="beast.math.distributions.MRCAPrior" monophyletic="true" tree="@Tree.t:OG0000301_1.Tree">
+                <taxonset id="salmonids_pike_divergence" spec="TaxonSet">
+                    <taxon id="Eluc1" spec="Taxon"/>
+                    <taxon idref="Ssal3"/>
+                </taxonset>
+                <Normal id="Normal.2" name="distr">
+                    <parameter id="RealParameter.10" estimate="false" name="mean">125.0</parameter>
+                    <parameter id="RealParameter.11" estimate="false" name="sigma">5.0</parameter>
+                </Normal>
+            </distribution>
+        </distribution>
+        <distribution id="likelihood" spec="util.CompoundDistribution" useThreads="true">
+            <distribution id="treeLikelihood.OG0000301_1." spec="ThreadedTreeLikelihood" data="@OG0000301_1." tree="@Tree.t:OG0000301_1.Tree">
+                <siteModel id="SiteModel.s:OG0000301_1.seccal_aa" spec="SiteModel">
+                    <parameter id="mutationRate.s:OG0000301_1.seccal_aa" estimate="false" name="mutationRate">1.0</parameter>
+                    <parameter id="gammaShape.s:OG0000301_1.seccal_aa" estimate="false" name="shape">1.0</parameter>
+                    <parameter id="proportionInvariant.s:OG0000301_1.seccal_aa" estimate="false" lower="0.0" name="proportionInvariant" upper="1.0">0.0</parameter>
+                    <substModel id="WAG.s:OG0000301_1.seccal_aa" spec="WAG"/>
+                </siteModel>
+                <branchRateModel id="RelaxedClock.c:OG0000301_1.Clock" spec="beast.evolution.branchratemodel.UCRelaxedClockModel" clock.rate="@ucldMean.c:OG0000301_1.Clock" rateCategories="@rateCategories.c:OG0000301_1.Clock" tree="@Tree.t:OG0000301_1.Tree">
+                    <LogNormal id="LogNormalDistributionModel.c:OG0000301_1.Clock" S="@ucldStdev.c:OG0000301_1.Clock" meanInRealSpace="true" name="distr">
+                        <parameter id="RealParameter.1" estimate="false" lower="0.0" name="M" upper="1.0">1.0</parameter>
+                    </LogNormal>
+                </branchRateModel>
+            </distribution>
+        </distribution>
+    </distribution>
+
+    <operator id="YuleBirthRateScaler.t:OG0000301_1.Tree" spec="ScaleOperator" parameter="@birthRate.t:OG0000301_1.Tree" scaleFactor="0.75" weight="3.0"/>
+
+    <operator id="YuleModelTreeScaler.t:OG0000301_1.Tree" spec="ScaleOperator" scaleFactor="0.5" tree="@Tree.t:OG0000301_1.Tree" weight="3.0"/>
+
+    <operator id="YuleModelTreeRootScaler.t:OG0000301_1.Tree" spec="ScaleOperator" rootOnly="true" scaleFactor="0.5" tree="@Tree.t:OG0000301_1.Tree" weight="3.0"/>
+
+    <operator id="YuleModelUniformOperator.t:OG0000301_1.Tree" spec="Uniform" tree="@Tree.t:OG0000301_1.Tree" weight="30.0"/>
+
+    <operator id="YuleModelSubtreeSlide.t:OG0000301_1.Tree" spec="SubtreeSlide" tree="@Tree.t:OG0000301_1.Tree" weight="15.0"/>
+
+    <operator id="YuleModelNarrow.t:OG0000301_1.Tree" spec="Exchange" tree="@Tree.t:OG0000301_1.Tree" weight="15.0"/>
+
+    <operator id="YuleModelWide.t:OG0000301_1.Tree" spec="Exchange" isNarrow="false" tree="@Tree.t:OG0000301_1.Tree" weight="3.0"/>
+
+    <operator id="YuleModelWilsonBalding.t:OG0000301_1.Tree" spec="WilsonBalding" tree="@Tree.t:OG0000301_1.Tree" weight="3.0"/>
+
+    <operator id="ucldStdevScaler.c:OG0000301_1.Clock" spec="ScaleOperator" parameter="@ucldStdev.c:OG0000301_1.Clock" scaleFactor="0.5" weight="3.0"/>
+
+    <operator id="CategoriesRandomWalk.c:OG0000301_1.Clock" spec="IntRandomWalkOperator" parameter="@rateCategories.c:OG0000301_1.Clock" weight="10.0" windowSize="1"/>
+
+    <operator id="CategoriesSwapOperator.c:OG0000301_1.Clock" spec="SwapOperator" intparameter="@rateCategories.c:OG0000301_1.Clock" weight="10.0"/>
+
+    <operator id="CategoriesUniform.c:OG0000301_1.Clock" spec="UniformOperator" parameter="@rateCategories.c:OG0000301_1.Clock" weight="10.0"/>
+
+    <operator id="ucldMeanScaler.c:OG0000301_1.Clock" spec="ScaleOperator" parameter="@ucldMean.c:OG0000301_1.Clock" scaleFactor="0.5" weight="1.0"/>
+
+    <operator id="relaxedUpDownOperator.c:OG0000301_1.Clock" spec="UpDownOperator" scaleFactor="0.75" weight="3.0">
+        <up idref="ucldMean.c:OG0000301_1.Clock"/>
+        <down idref="Tree.t:OG0000301_1.Tree"/>
+    </operator>
+
+    <logger id="tracelog" fileName="OG0000301_1..log.txt" logEvery="1000" model="@posterior" sanitiseHeaders="true" sort="smart">
+        <log idref="posterior"/>
+        <log idref="likelihood"/>
+        <log idref="prior"/>
+        <log idref="treeLikelihood.OG0000301_1."/>
+        <log id="TreeHeight.t:OG0000301_1.Tree" spec="beast.evolution.tree.TreeHeightLogger" tree="@Tree.t:OG0000301_1.Tree"/>
+        <log idref="YuleModel.t:OG0000301_1.Tree"/>
+        <log idref="birthRate.t:OG0000301_1.Tree"/>
+        <log idref="ucldStdev.c:OG0000301_1.Clock"/>
+        <log id="rate.c:OG0000301_1.Clock" spec="beast.evolution.branchratemodel.RateStatistic" branchratemodel="@RelaxedClock.c:OG0000301_1.Clock" tree="@Tree.t:OG0000301_1.Tree"/>
+        <log idref="monophyletic_group_1.prior"/>
+        <log idref="ucldMean.c:OG0000301_1.Clock"/>
+        <log idref="monophyletic_group_2.prior"/>
+        <log idref="salmonids_pike_divergence.prior"/>
+    </logger>
+
+    <logger id="screenlog" logEvery="1000">
+        <log idref="posterior"/>
+        <log id="ESS.0" spec="util.ESS" arg="@posterior"/>
+        <log idref="likelihood"/>
+        <log idref="prior"/>
+    </logger>
+
+    <logger id="treelog.t:OG0000301_1.Tree" fileName="$(tree).trees.txt" logEvery="1000" mode="tree">
+        <log id="TreeWithMetaDataLogger.t:OG0000301_1.Tree" spec="beast.evolution.tree.TreeWithMetaDataLogger" branchratemodel="@RelaxedClock.c:OG0000301_1.Clock" tree="@Tree.t:OG0000301_1.Tree"/>
+    </logger>
+
+</run>
+
+</beast>
