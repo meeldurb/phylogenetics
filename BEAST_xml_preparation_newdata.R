@@ -53,14 +53,16 @@ xml <- paste('C:/Users/meeldurb/Dropbox/Melanie/',
 
 
 # 
-# # Table with duplicate pairs
-# dup_cluster_phylofilt <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
-#                                'Beast_dating_salmonids/RData/',
-#                                '20170801_duplicate_clans_filtered_aa.RData', 
-#                                 sep = ''))
+# Table with duplicate pairs
+
+dup_cluster_phylofilt <- loadRData(paste('C:/Users/meeldurb/Dropbox/',
+                                         'Melanie/Master_internship_',
+                                         'phylogenetics/phylogenetics/RData/',
+                                         '20170913_duplicate_clans_filtered_final_nt.RData', 
+                                         sep = ''))
 
 # Table with duplicate pairs
-dup_table <- paste('C:/Users/meeldurb/Dropbox/Melanie/',
+dup.table <- paste('C:/Users/meeldurb/Dropbox/Melanie/',
                    'Master_internship_phylogenetics/', 
                    'phylogenetics/RData/',
                    '20170913_duplicate_clans_filtered_final_nt.csv', 
@@ -76,9 +78,9 @@ dup_table <- paste('C:/Users/meeldurb/Dropbox/Melanie/',
 for (ali in alignment.files){
   clan.id <- sub('.*(OG\\d*_\\d*.+)aln', '\\1', ali)
   cat(clan.id, '\n')
-  if (clan.id %in% dup.table[,1]){
+  if (clan.id %in% dup_cluster_phylofilt[,1]){
   convertcmd <- paste("python 20170913-transform_XML_new.py ", xml, ' "', ali, '" ', 
-                      dup_table, sep = "")
+                      dup.table, sep = "")
   system(convertcmd)
   } else {
     print ("clan not in duplicate table")
