@@ -27,7 +27,7 @@ name="alignment">
 <map name="OneOnX" >beast.math.distributions.OneOnX</map>
 
 
-<run id="mcmc" spec="MCMC" chainLength="10000000" preBurnin="5">
+<run id="mcmc" spec="MCMC" chainLength="10000000" preBurnin="0">
     <state id="state" storeEvery="5000">
         <tree id="Tree.t:OG0000301_1.Tree" name="stateNode">
             <taxonset id="TaxonSet.OG0000301_1." spec="TaxonSet">
