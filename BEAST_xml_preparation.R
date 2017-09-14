@@ -11,7 +11,9 @@
 ##_____ load libraries and functions _____##
 #------------------------------------------#
 
-install.packages("RCurl", repos = "http://cran.rstudio.com/")
+# dir.create(Sys.getenv("R_LIBS_USER"), showWarnings = FALSE, recursive = TRUE)
+# 
+# install.packages('RCurl', Sys.getenv("R_LIBS_USER"), repos = "http://cran.case.edu" )
 
 
 library("RCurl")
@@ -53,7 +55,11 @@ dup_cluster_phylofilt <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
                                '20170801_duplicate_clans_filtered_aa.RData', 
                                 sep = ''))
 
-
+# Table with duplicate pairs
+dup_table <- paste('C:/Users/meeldurb/Dropbox/Melanie/',
+                   'Beast_dating_salmonids/RData/',
+                   '20170801_duplicate_clans_filtered_aa.csv', 
+                    sep = '')
 
 #------------------------------#
 ##_____ Make BEAST files _____##
@@ -62,22 +68,11 @@ dup_cluster_phylofilt <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
 
 
 
-# orthologs.list <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
-#                                  'Beast_dating_salmonids/orthologs_list_20161115.RData',
-#                                  sep = ''))
-
-# claninformation is contained in  OG_clans_dupl
-
-#------------------------------------------------------#
-##_____ Make BEAST files, example 1 OG alingment _____##
-#------------------------------------------------------#
-
-
 for (ali in alignment.files){
   clan.id <- sub('.*(OG\\d*_\\d*.)_corr.fa', '\\1', ali)
-  cat(clan.id)
+  cat(clan.id, '\n')
   if (clan.id %in% dup_cluster_phylofilt[,1]){
-  convertcmd <- paste("python transform_XML.py", xml, ali,  dup_cluster_phylofilt)
+  convertcmd <- paste("python transform_XML.py", xml, ali, dup_table)
   system(convertcmd)
   } else {
     print ("clan not in duplicate table")
