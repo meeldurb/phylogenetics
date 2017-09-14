@@ -49,7 +49,7 @@ alignment.files <- dir(paste('C:/Users/meeldurb/Google Drive/',
 # xml file we need to import the alingment in
 xml <- paste('C:/Users/meeldurb/Dropbox/Melanie/',
              'Master_internship_phylogenetics/',
-             'phylogenetics/dummy_xml/secondary_constr_nt.xml', sep = '')
+             'phylogenetics/dummy_xml/sec_constr_nt.xml', sep = '')
 
 
 # 
