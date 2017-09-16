@@ -13,12 +13,15 @@
 #------------------------------------------#
 
 # reading BEAST trees
-install.packages('ips',  repos = "http://cran.rstudio.com/" )  
-install.packages("tree", repos = "http://cran.rstudio.com/")
-install.packages("devtools", repos = "http://cran.rstudio.com/")
-install.packages("RSQLite", repos = "http://cran.rstudio.com/")
-install.packages("phangorn", repos = "http://cran.rstudio.com/")
-install.packages('phytools', repos = "http://cran.rstudio.com/")
+
+# dir.create(Sys.getenv("R_LIBS_USER"), showWarnings = FALSE, recursive = TRUE)
+# 
+# install.packages('ips',  Sys.getenv("R_LIBS_USER"), repos = "http://cran.case.edu" ) 
+# install.packages("tree", Sys.getenv("R_LIBS_USER"), repos = "http://cran.case.edu" )
+# install.packages("devtools", Sys.getenv("R_LIBS_USER"), repos = "http://cran.case.edu" )
+# install.packages("RSQLite", Sys.getenv("R_LIBS_USER"), repos = "http://cran.case.edu" )
+# install.packages("phangorn", Sys.getenv("R_LIBS_USER"), repos = "http://cran.case.edu" )
+# install.packages('phytools', Sys.getenv("R_LIBS_USER"), repos = "http://cran.case.edu" )
 
 library(ips)
 library(tree)
@@ -45,12 +48,12 @@ library(Ssa.RefSeq.db)
 
 trees = dir(paste('C:/Users/meeldurb/Dropbox/Melanie/',
                   'Master_internship_phylogenetics/',
-                  'phylogenetics/TreeAnnotator_results/',
+                  'phylogenetics/20170916-TreeAnnotator/',
                   sep = ''), full.names = T)
 
 
 beast.trees <- lapply(trees, read.beast)
-plot(beast.tr[[1]])
+plot(beast.trees[[1]])
 
 #beast.trees2 <- beast.trees[1:5]
 #---------------------------#
@@ -58,6 +61,7 @@ plot(beast.tr[[1]])
 #---------------------------#
 
 # remove the trees without branchlengths
+beast.trees.na <- NULL
 for (i in 1:length(beast.trees)){
   #print (tree)
   #i <- sum(i, 1)
@@ -118,7 +122,7 @@ nodeages.Ss4R <- as.data.frame(cbind(Ss4R.nodeage.est, Ss4R.nodeage.max, Ss4R.no
                                      ssal.dup1, ssal.dup2))
 colnames(nodeages.Ss4R) <- c('estimate', 'max', 'min', 'ssal1', 'ssal2')
 
-write.table(nodeages.Ss4R, file = "nodeages_Ss4r.csv", append = F, 
+write.table(nodeages.Ss4R, file = "20170916-nodeages_Ss4r.csv", append = F, 
             sep = ";", quote = F, col.names = T, row.names = F)
 
 
@@ -138,12 +142,34 @@ write.table(nodeages.Ss4R, file = "nodeages_Ss4r.csv", append = F,
 ##_____ duplicate chr positions _____##
 #-------------------------------------#
 
-salmon.tips <- which(substr(tree$tip.label, 1, 4) == 'Ssal')
-salmon.dups <- substr(tree$tip.label[salmon.tips], 6, 1000)
+salmon.tips <- which(substr(all.trees[[1]]$tip.label, 1, 4) == 'Ssal')
+salmon.dups <- substr(all.trees[[1]]$tip.label[salmon.tips], 6, 1000)
 
 
 #get.id('*') # get all genes/proteins/transcripts
 
 proteinid <- get.gtf(get.id(salmon.dups, id.type = 'protein')$gene_id)
+
+
+# n =1
+# for (i in 1:length(beast.trees)){
+#   salmon.tips <- which(substr(beast.trees[[i]]$tip.label, 1, 4) == 'Ssal')
+# }
+# 
+# i <- beast.trees[[1]]
+
+salmon.tips <- lapply(all.trees, function(i) {
+  which(substr(i$tip.label, 1, 4) == 'Ssal')
+})
+
+salmon.dups <- NULL
+for (i in 1:length(all.trees)){
+  salmon.dups[[i]] <- substr(all.trees[[i]]$tip.label[salmon.tips[[i]]], 6, 1000)
+}
+
+
+
+# retrieve chromosomes and positions
+# give different color per chromosome
 
 
