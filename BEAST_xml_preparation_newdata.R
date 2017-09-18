@@ -34,7 +34,7 @@ eval(parse(text = getURL(paste("https://raw.githubusercontent.com/",
 OG_clans_dupl <- loadRData(paste('C:/Users/meeldurb/Dropbox/',
                                      'Melanie/Master_internship_',
                                      'phylogenetics/phylogenetics/RData/',
-                                     '20170913-Clans_forBEAST_dupssandElucfilt_nt.RData', 
+                                     '20170918-Clans_forBEAST_dupssandElucfilt_nt.RData', 
                                      sep = ''))
 
 
@@ -42,7 +42,7 @@ OG_clans_dupl <- loadRData(paste('C:/Users/meeldurb/Dropbox/',
 alignment.files <- dir(paste('C:/Users/meeldurb/Google Drive/',
                             'Master internship phylogenetics salmonids/',
                             'Salmonid_genomics_resources/Orthologs_homeologs/',
-                            'orthogroups_2017/cds_macse_nt_align', sep = ''), 
+                            'orthogroups_2017/cds_macse_nt_align.rn', sep = ''), 
                              full.names = T)
 
 
@@ -54,7 +54,6 @@ xml <- paste('C:/Users/meeldurb/Dropbox/Melanie/',
 
 # 
 # Table with duplicate pairs
-
 dup_cluster_phylofilt <- loadRData(paste('C:/Users/meeldurb/Dropbox/',
                                          'Melanie/Master_internship_',
                                          'phylogenetics/phylogenetics/RData/',
@@ -75,16 +74,21 @@ dup.table <- paste('C:/Users/meeldurb/Dropbox/Melanie/',
 
 
 #clan.id <- 'OG0000301_1.'
+outdir <- ("xml_outfiles_1809/")
 for (ali in alignment.files){
   clan.id <- sub('.*(OG\\d*_\\d*.+)aln', '\\1', ali)
+  outfile = paste(outdir, clan.id, "xml", sep = "")
   cat(clan.id, '\n')
-  if (clan.id %in% dup_cluster_phylofilt[,1]){
-  convertcmd <- paste("python 20170913-transform_XML_new.py ", xml, ' "', ali, '" ', 
-                      dup.table, sep = "")
-  system(convertcmd)
-  } else {
-    print ("clan not in duplicate table")
-  }
+  if (!file.exists(outfile)){
+    if (clan.id %in% dup_cluster_phylofilt[,1]){
+      convertcmd <- paste("python 20170913-transform_XML_new.py ", xml, ' "', ali, '" ', 
+                          dup.table, sep = "")
+      system(convertcmd)
+    } else {
+      print ("clan not in duplicate table")
+    }
+  } else
+    print ("file already existst")
 }
 
 
