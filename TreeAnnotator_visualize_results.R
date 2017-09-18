@@ -118,8 +118,8 @@ for (pos in height.pos){
 
 
      
-nodeages.Ss4R <- as.data.frame(cbind(Ss4R.nodeage.est, Ss4R.nodeage.max, Ss4R.nodeage.min,
-                                     ssal.dup1, ssal.dup2))
+nodeages.Ss4R <- data.frame(Ss4R.nodeage.est, Ss4R.nodeage.max, Ss4R.nodeage.min,
+                            ssal.dup1, ssal.dup2, stringsAsFactors = F)
 colnames(nodeages.Ss4R) <- c('estimate', 'max', 'min', 'ssal1', 'ssal2')
 
 write.table(nodeages.Ss4R, file = "20170916-nodeages_Ss4r.csv", append = F, 
@@ -173,30 +173,91 @@ for (i in 1:length(all.trees)){
   dup.chrom.df <- rbind(dup.chrom.df, dup.chrom.pos)
 }
 
-colnames(dup.chrom.df) <- c("chr1", "start1", "end1", "chr2", "start2", "end2" )
-
-Ss4R.chrom.pos <- cbind(dup.chrom.df, nodeages.Ss4R[,1:3] )
-Ss4R.chrom.pos.ord <- Ss4R.chrom.pos[order(Ss4R.chrom.pos[,1], 
-                                           Ss4R.chrom.pos[,2]),]
 
 
-ssa1 <- Ss4R.chrom.pos.ord[Ss4R.chrom.pos.ord$chr1 == "ssa01",]
+Ss4R.time.chrompos <- data.frame(dup.chrom.df, nodeages.Ss4R[,1:3] )
+Ss4R.time.chrompos.ord <- Ss4R.time.chrompos[order(Ss4R.time.chrompos[,1], 
+                                                  Ss4R.time.chrompos[,2]),]
 
-par(mfrow = c(1,1))
-plot(x = ssa1$start1, y = ssa1$estimate, xlab = "chromosome position",
-     ylab = "Ss4R nodeage estimate")
+colnames(Ss4R.time.chrompos.ord) <- c("chr1", "start1", "end1", "chr2", "start2", "end2", 
+                            "estimate", "max", "min")
 
+write.table(Ss4R.time.chrompos.ord, file = "20170918-Ss4r_time&chropos.csv", append = F, 
+            sep = ";", quote = F, col.names = T, row.names = F)
+
+
+
+#-------------------------------------------------#
+##_____ Plotting nodeages Ss4R and chro pos _____##
+#-------------------------------------------------#
 
 for (chr1 in unique(Ss4R.chrom.pos.ord$chr1)){
   cat (chr1, "\n")
   all.rows <- which(Ss4R.chrom.pos.ord$chr1 == chr1)
-  chr2.df <- Ss4R.chrom.pos.ord[ Ss4R.chrom.pos.ord[all.rows, 4]]
+  chr2.df <- Ss4R.chrom.pos.ord[all.rows, 4]
   for (chr2 in unique(chr2.df)){
     cat (chr2, "\n")
     #barplot(x = Ss4R.chrom.pos.ord)
   }
   
 }
+
+#--------------------------------------#
+##_____ example tree, nodelabels _____##
+#--------------------------------------#
+
+
+all.trees[[7]]$tip.label <- c("Rainbow trout (Oncorhynchus mykiss)", 
+                              "Grayling (Thymallus Thymallus)", 
+                              "Coho salmon (Oncorhynchus kisutch)",
+                              "Atlantic salmon (Salmo salar)", 
+                              "Atlantic salmon (Salmo salar)", 
+                              "Zebrafish (Danio rerio)", 
+                              "Rainbow trout (Oncorhynchus mykiss)", 
+                              "Grayling (Thymallus Thymallus)", 
+                              "Coho salmon (Oncorhynchus kisutch)",
+                              "Northern pike (Esox Lucius)")
+plot(all.trees[[7]])
+node.ages <- round(all.trees[[7]]$height, digits = 1)
+nodelabels(node.ages, frame = "r", bg = "white")
+
+
+#--------------------------------#
+##_____ average nodelabels _____##
+#--------------------------------#
+library(dplyr)
+library(plyr)
+install.packages("Stack")
+library(stack)
+library(ggplot2)
+library(grid)
+library(stringr)
+
+
+Ss4R.time.chr <- read.table(file = "20170918-Ss4r_time&chropos.csv", 
+                    sep = ";", stringsAsFactors = F, header = T)
+
+Ss4R.chr <- read.table(file = "20170918-Ss4r_time_est_and_chro.csv", 
+                            sep = ";", stringsAsFactors = F, header = T)
+Ss4R.chr$chr1 <- as.character(str_pad(Ss4R.chr$chr1, 2, pad = "0"))
+
+
+
+boxplot(estimate~chr1, data = Ss4R.chr, xlab = "chromosome number",
+        ylab = "divergence time after Ss4R (Mya)", col = rainbow(12))
+
+fill <- "#4271AE"
+line <- "#1F3552"
+
+boxplot.Ss4R <- ggplot(Ss4R.chr, aes(x=chr1, y=estimate)) +
+  geom_boxplot(fill = fill, color = line, alpha = 0.7) +
+  theme_bw() +
+  scale_x_discrete(name = "Chromosome number") +
+  scale_y_continuous(name = "Divergence time after Ss4R (Mya)") +
+  theme(text = element_text(size = 14),
+        axis.text= element_text(size = 13)) 
+
+boxplot.Ss4R
 
 
 #-----------------------------------------#
