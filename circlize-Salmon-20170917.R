@@ -341,9 +341,21 @@ cells$col <- as.character(unlist(mget(cells$col, ifnotfound = list(function(x) g
 
 par(mar = c(1, 1, 1, 1))
 circos.par(start.degree = 90)
-circos.initializeWithIdeogram(data.frame(karyo), track.height=0.05, ideogram.height = 0.03, chromosome.index = sort(unique(karyo$V1)))
-circos.genomicTrackPlotRegion(regions_annot.bed, track.height=0.02, panel.fun = function(region,  value,  ...) {
+circos.initializeWithIdeogram(data.frame(karyo), track.height=0.05, ideogram.height = 0.03, 
+                              chromosome.index = sort(unique(karyo$V1)))
+circos.genomicTrackPlotRegion(regions_annot.bed, track.height=0.02, 
+                              panel.fun = function(region,  value,  ...) {
   circos.genomicRect(region, value, col = value$col, border = NA, ...)
+})
+
+Ss4R.time.chr <- read.table(file = "20170918-Ss4r_time&chropos.csv", 
+                            sep = ";", stringsAsFactors = F, header = T)
+Ss4R.time.chr <- na.omit(Ss4R.time.chr)
+
+
+circos.genomicTrackPlotRegion(data.frame(Ss4R.time.chr[,1:7]), track.height=0.2, 
+                              panel.fun = function(region, value,...){
+  circos.genomicLines(region, value, type="l", col="blue", border=NA, ylim=c(0,1500),...)
 })
 circos.genomicLink(cells[,1:3], cells[,4:6], col = cells$col, border = NA)
 
