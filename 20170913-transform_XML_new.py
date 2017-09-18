@@ -65,7 +65,7 @@ def parse_into_xml(xml_filename, ali_filename, dup_filename):
     dup_table = parse_dup_table(dup_filename)
     dup_ID = dup_table[str(new_ID)]
     #print dup_ID
-    newdir = 'xml_outfiles_new/'
+    newdir = 'xml_outfiles_1809/'
     if not os.path.exists(newdir):
         os.makedirs(newdir)
     xml_out_filename = newdir + new_ID + "xml"
