@@ -99,7 +99,7 @@ head(lookup, 50)
 fasta.files <- paste('/mnt/users/garethg/git/resam/',
                     'orthogroups_2017/orthofinder/',
                     'Results/align_clans/cds_macse_',
-                    'nt_align/', sep = '')
+                    'nt_align.rn/', sep = '')
 head(dir(fasta.files, full.names = T))
 
 # read the alignments in memory
@@ -148,7 +148,7 @@ length(alignments)
 length(alignments_filtered)
 
 save(alignments, file = paste('/mnt/users/melavan/RData/',
-                              '20170913-Clan_alignments_nt.RData', sep = ''))
+                              '20170918-Clan_alignments_nt.RData', sep = ''))
 
 ##---------------------------##
 #_____ Find proper trees _____#
@@ -162,10 +162,10 @@ alignments.df = ldply(alignments_filtered, function(i) {
 
 
 save(alignments.df, file = paste('/mnt/users/melavan/RData/',
-                                  '20170913-Clan_alignments_df_nt.RData', sep = ''))
+                                  '20170918-Clan_alignments_df_nt.RData', sep = ''))
 
 alignments.df <- loadRData(paste('/mnt/users/melavan/RData/',
-                                 '20170913-Clan_alignments_df_nt.RData', sep = ''))
+                                 '20170918-Clan_alignments_df_nt.RData', sep = ''))
 
 head(alignments.df)
 dim(alignments.df)
@@ -184,7 +184,7 @@ OG_clans_filt = OG_clans[idx.toanalyze]
 length(OG_clans_filt)
 
 save(OG_clans_filt, file = paste('/mnt/users/melavan/RData/',
-                                  '20170913-OG_clans_filt_nt.RData',
+                                  '20170918-OG_clans_filt_nt.RData',
                                   sep = ''))
 
 
@@ -196,7 +196,7 @@ save(OG_clans_filt, file = paste('/mnt/users/melavan/RData/',
 ##---------------------------##
 
 OG_clans_filt <- loadRData(paste('/mnt/users/melavan/RData/',
-                                  '20170913-OG_clans_filt_nt.RData',
+                                  '20170918-OG_clans_filt_nt.RData',
                                   sep = ''))
 
 # use dup tables below and check that clans contain 
@@ -310,10 +310,10 @@ length(OG_clans_dupl_Eluc_filt)
 
 
 save(OG_clans_dupl_Eluc_filt, file = paste('/mnt/users/melavan/RData/',
-                                           '20170913-Clans_forBEAST_dupssandElucfilt_nt.RData', 
+                                           '20170918-Clans_forBEAST_dupssandElucfilt_nt.RData', 
                                            sep = ''))
 OG_clans_dupl <- loadRData(paste('/mnt/users/melavan/RData/',
-                                 '20170913-Clans_forBEAST_dupssandElucfilt_nt.RData', 
+                                 '20170918-Clans_forBEAST_dupssandElucfilt_nt.RData', 
                                  sep = ''))
 
 
