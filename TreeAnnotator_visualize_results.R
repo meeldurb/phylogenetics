@@ -142,34 +142,98 @@ write.table(nodeages.Ss4R, file = "20170916-nodeages_Ss4r.csv", append = F,
 ##_____ duplicate chr positions _____##
 #-------------------------------------#
 
-salmon.tips <- which(substr(all.trees[[1]]$tip.label, 1, 4) == 'Ssal')
-salmon.dups <- substr(all.trees[[1]]$tip.label[salmon.tips], 6, 1000)
+# salmon.tips <- which(substr(all.trees[[1]]$tip.label, 1, 4) == 'Ssal')
+# salmon.dups <- substr(all.trees[[1]]$tip.label[salmon.tips], 6, 1000)
 
-
-#get.id('*') # get all genes/proteins/transcripts
-
-proteinid <- get.gtf(get.id(salmon.dups, id.type = 'protein')$gene_id)
-
-
-# n =1
+# n = 1
 # for (i in 1:length(beast.trees)){
 #   salmon.tips <- which(substr(beast.trees[[i]]$tip.label, 1, 4) == 'Ssal')
 # }
 # 
-# i <- beast.trees[[1]]
+# i <- 1
 
+# find the tree tips that have salmon
 salmon.tips <- lapply(all.trees, function(i) {
   which(substr(i$tip.label, 1, 4) == 'Ssal')
 })
 
+# get the names of the salmon proteins
 salmon.dups <- NULL
 for (i in 1:length(all.trees)){
   salmon.dups[[i]] <- substr(all.trees[[i]]$tip.label[salmon.tips[[i]]], 6, 1000)
 }
 
 
+# find the corresponding chromosome positions of the proteins on the genome
+dup.chrom.df <- NULL
+for (i in 1:length(all.trees)){
+  proteinid <- get.gtf(get.id(salmon.dups[[i]], id.type = 'protein')$gene_id)
+  dup.chrom.pos <- as.data.frame(c(proteinid[1,2:4], proteinid[2,2:4]), 
+                                 stringsAsFactors = F)
+  dup.chrom.df <- rbind(dup.chrom.df, dup.chrom.pos)
+}
 
-# retrieve chromosomes and positions
+colnames(dup.chrom.df) <- c("chr1", "start1", "end1", "chr2", "start2", "end2" )
+
+Ss4R.chrom.pos <- cbind(dup.chrom.df, nodeages.Ss4R[,1:3] )
+Ss4R.chrom.pos.ord <- Ss4R.chrom.pos[order(Ss4R.chrom.pos[,1], 
+                                           Ss4R.chrom.pos[,2]),]
+
+
+ssa1 <- Ss4R.chrom.pos.ord[Ss4R.chrom.pos.ord$chr1 == "ssa01",]
+
+par(mfrow = c(1,1))
+plot(x = ssa1$start1, y = ssa1$estimate, xlab = "chromosome position",
+     ylab = "Ss4R nodeage estimate")
+
+
+for (chr1 in unique(Ss4R.chrom.pos.ord$chr1)){
+  cat (chr1, "\n")
+  all.rows <- which(Ss4R.chrom.pos.ord$chr1 == chr1)
+  chr2.df <- Ss4R.chrom.pos.ord[ Ss4R.chrom.pos.ord[all.rows, 4]]
+  for (chr2 in unique(chr2.df)){
+    cat (chr2, "\n")
+    #barplot(x = Ss4R.chrom.pos.ord)
+  }
+  
+}
+
+
+#-----------------------------------------#
+##_____ Make data for circlize plot _____##
+#-----------------------------------------#
+
+# order by chromosomeno
+dup.chrom.df.ord <- dup.chrom.df[order(dup.chrom.df[,1], 
+                                       dup.chrom.df[,2]),]
+
+
+
+
+#get.id('*') # get all genes/proteins/transcripts
+#proteinid <- get.gtf(get.id(salmon.dups, id.type = 'protein')$gene_id)
+#dup.chrom.pos <- as.data.frame(c(proteinid[1,2:4], proteinid[2,2:4]))
+
+# retrieve chromosome number
 # give different color per chromosome
 
+colors <- c('cigene_21_1', 'cigene_21_2', 'cigene_21_3', 'cigene_21_4', 'cigene_21_5', 
+            'cigene_21_6', 'cigene_21_7', 'cigene_21_8', 'cigene_21_9', 'cigene_21_10',
+            'cigene_21_11', 'cigene_21_12', 'cigene_21_13', 'cigene_21_14', 'cigene_21_15',
+            'cigene_21_16', 'cigene_21_17', 'cigene_21_18', 'cigene_21_19', 'cigene_21_20',
+            'cigene_21_21'  )
 
+dup.chrom.df.ord$color <- NA
+colorit <- 0
+for (chro in unique(dup.chrom.df.ord$chr1)){
+  colorit <- sum(colorit, 1)
+  chro.pos <- which(dup.chrom.df.ord$chr1 == chro)
+  dup.chrom.df.ord[chro.pos, 7] <- colors[colorit]
+}
+
+colorit
+
+
+
+write.table(dup.chrom.df.ord, file = "20170918-duplicates_chrompos.txt", 
+              append = F, col.names = F, row.names = F, sep = "\t", quote = FALSE)
