@@ -1,5 +1,5 @@
-install.packages('circlize',  repos = "http://cran.rstudio.com/" )  
-install.packages('data.table', repos = "http://cran.rstudio.com/")
+##install.packages('circlize',  repos = "http://cran.rstudio.com/" )  
+#install.packages('data.table', repos = "http://cran.rstudio.com/")
 
 library(circlize)
 library(data.table)
@@ -348,14 +348,14 @@ circos.genomicTrackPlotRegion(regions_annot.bed, track.height=0.02,
   circos.genomicRect(region, value, col = value$col, border = NA, ...)
 })
 
-Ss4R.time.chr <- read.table(file = "20170918-Ss4r_time&chropos.csv", 
+Ss4R.time.chr <- read.table(file = "20170919-Ss4r_time&chropos_fortrack.csv", 
                             sep = ";", stringsAsFactors = F, header = T)
 Ss4R.time.chr <- na.omit(Ss4R.time.chr)
 
 
-circos.genomicTrackPlotRegion(data.frame(Ss4R.time.chr[,1:7]), track.height=0.2, 
+circos.genomicTrackPlotRegion(data.frame(Ss4R.time.chr[,1:4]), track.height=0.2, 
                               panel.fun = function(region, value,...){
-  circos.genomicLines(region, value, type="l", col="blue", border=NA, ylim=c(0,1500),...)
+  circos.genomicPoints(region, value, type="l", col="dark red", cex = 0.2, border=NA, ylim=c(0,1500),...)
 })
 circos.genomicLink(cells[,1:3], cells[,4:6], col = cells$col, border = NA)
 
