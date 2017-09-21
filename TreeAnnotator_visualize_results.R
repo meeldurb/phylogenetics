@@ -22,6 +22,7 @@
 # install.packages("RSQLite", Sys.getenv("R_LIBS_USER"), repos = "http://cran.case.edu" )
 # install.packages("phangorn", Sys.getenv("R_LIBS_USER"), repos = "http://cran.case.edu" )
 # install.packages('phytools', Sys.getenv("R_LIBS_USER"), repos = "http://cran.case.edu" )
+# install_github("FabianGrammes/Ssa.RefSeq.db", Sys.getenv("R_LIBS_USER"), repos = "http://cran.case.edu")
 
 library(ips)
 library(tree)
@@ -29,15 +30,14 @@ library(devtools)
 library(RSQLite)
 library(phangorn)
 library(phytools)
-
-install_github("FabianGrammes/Ssa.RefSeq.db")
+library(ggplot2)
 library(Ssa.RefSeq.db)
 
 #------------------------------------------------------#
 ##_____ Summarize BEAST trees with TreeAnnotator _____##
 #------------------------------------------------------#
 
-#system('sbatch -a 1-633 %20 TreeAnnotator_submit.sh 10')
+#system('sbatch -a 1-5792 %20 TreeAnnotator_submit.sh 10')
 
 
 
@@ -56,9 +56,7 @@ beast.trees <- lapply(trees, read.beast)
 plot(beast.trees[[1]])
 
 #beast.trees2 <- beast.trees[1:5]
-#---------------------------#
-##_____ Ss4R distance _____##
-#---------------------------#
+
 
 # remove the trees without branchlengths
 beast.trees.na <- NULL
@@ -77,6 +75,10 @@ all.trees <- beast.trees[!is.na(beast.trees)]
 # plot(all.trees[[2]])
 # nodelabels()
 # tiplabels()
+
+#---------------------------#
+##_____ Ss4R distance _____##
+#---------------------------#
 
 # find Omyk and Ssal in the tip labels and get MRCA 
 Ss4R.nodes <- sapply(all.trees, function(i){
@@ -122,7 +124,7 @@ nodeages.Ss4R <- data.frame(Ss4R.nodeage.est, Ss4R.nodeage.max, Ss4R.nodeage.min
                             ssal.dup1, ssal.dup2, stringsAsFactors = F)
 colnames(nodeages.Ss4R) <- c('estimate', 'max', 'min', 'ssal1', 'ssal2')
 
-write.table(nodeages.Ss4R, file = "20170916-nodeages_Ss4r.csv", append = F, 
+write.table(nodeages.Ss4R, file = "20170919-nodeages_Ss4r.csv", append = F, 
             sep = ";", quote = F, col.names = T, row.names = F)
 
 
@@ -136,6 +138,62 @@ write.table(nodeages.Ss4R, file = "20170916-nodeages_Ss4r.csv", append = F,
 # Descendants(tree, 11, "tips")
 # Siblings(tree, 3)
 #
+
+#-------------------------------------#
+##_____ Esox nodeages positions _____##
+#-------------------------------------#
+
+i <- all.trees[[8]]
+plot(i)
+nodelabels()
+# find Eluc and Ssal in the tip labels and get MRCA 
+Esox.nodes <- sapply(all.trees, function(i){
+  getMRCA(i, c(which(substr(i$tip.label, 1, 4) == 'Ssal'), 
+               which(substr(i$tip.label, 1, 4) == 'Eluc')))
+})
+
+
+# get node age of the Ss4R node
+height.pos <- sapply(unlist(Esox.nodes), function(i){
+  i }) - sapply(all.trees, function(i){
+    length(i$tip.label) 
+  }) 
+
+
+# get all the node age estimates
+# and the salmon duplicates
+
+Esox.nodeage.est <- NULL
+Esox.nodeage.min <- NULL
+Esox.nodeage.max <- NULL
+ssal.dup1 <- NULL
+ssal.dup2 <- NULL
+
+i <- 0
+for (pos in height.pos){
+  #cat(pos, "\n")
+  i <- sum(i, 1)
+  Esox.nodeage.est <- c(Ss4R.nodeage.est, all.trees[[i]]$height[pos])
+  Esox.nodeage.min <- c(Ss4R.nodeage.min, all.trees[[i]]$`height_95%_HPD_MIN`[pos])
+  Esox.nodeage.max <- c(Ss4R.nodeage.max, all.trees[[i]]$`height_95%_HPD_MAX`[pos])
+  # find salmon dups in the tree
+  salmon.tips <- which(substr(all.trees[[i]]$tip.label, 1, 4) == 'Ssal')
+  salmon.dups <- substr(all.trees[[i]]$tip.label[salmon.tips], 6, 1000)
+  ssal.dup1 <- c(ssal.dup1, salmon.dups[1])
+  ssal.dup2 <- c(ssal.dup2, salmon.dups[2])
+  
+}
+
+
+
+nodeages.Esox <- data.frame(Esox.nodeage.est, Esox.nodeage.max, Esox.nodeage.min,
+                            ssal.dup1, ssal.dup2, stringsAsFactors = F)
+colnames(nodeages.Esox) <- c('estimate', 'max', 'min', 'ssal1', 'ssal2')
+
+write.table(nodeages.Esox, file = "20170920-nodeages_Esox.csv", append = F, 
+            sep = ";", quote = F, col.names = T, row.names = F)
+
+
 
 
 #-------------------------------------#
@@ -174,7 +232,7 @@ for (i in 1:length(all.trees)){
 }
 
 
-
+colnames(dup.chrom.df) <- c("chr1", "start1", "end1", "chr2", "start2", "end2")
 Ss4R.time.chrompos <- data.frame(dup.chrom.df, nodeages.Ss4R[,1:3] )
 Ss4R.time.chrompos.ord <- Ss4R.time.chrompos[order(Ss4R.time.chrompos[,1], 
                                                   Ss4R.time.chrompos[,2]),]
@@ -182,7 +240,7 @@ Ss4R.time.chrompos.ord <- Ss4R.time.chrompos[order(Ss4R.time.chrompos[,1],
 colnames(Ss4R.time.chrompos.ord) <- c("chr1", "start1", "end1", "chr2", "start2", "end2", 
                             "estimate", "max", "min")
 
-write.table(Ss4R.time.chrompos.ord, file = "20170918-Ss4r_time&chropos.csv", append = F, 
+write.table(Ss4R.time.chrompos.ord, file = "20170919-Ss4r_time&chropos.csv", append = F, 
             sep = ";", quote = F, col.names = T, row.names = F)
 
 
@@ -225,21 +283,19 @@ nodelabels(node.ages, frame = "r", bg = "white")
 #--------------------------------#
 ##_____ average nodelabels _____##
 #--------------------------------#
-library(dplyr)
-library(plyr)
-install.packages("Stack")
-library(stack)
-library(ggplot2)
-library(grid)
-library(stringr)
 
 
-Ss4R.time.chr <- read.table(file = "20170918-Ss4r_time&chropos.csv", 
+
+
+
+Ss4R.time.chr <- read.table(file = "20170919-Ss4r_time&chropos.csv", 
                     sep = ";", stringsAsFactors = F, header = T)
 
-Ss4R.chr <- read.table(file = "20170918-Ss4r_time_est_and_chro.csv", 
+Ss4R.chr <- read.table(file = "20170919-Ss4r_time_est_and_chro.csv", 
                             sep = ";", stringsAsFactors = F, header = T)
-Ss4R.chr$chr1 <- as.character(str_pad(Ss4R.chr$chr1, 2, pad = "0"))
+Ss4R.chr$chr1 <- as.character(substr(Ss4R.chr$chr1, 4, 6))
+Ss4R.chr <- Ss4R.chr[order(Ss4R.chr$chr1),]
+row.names(Ss4R.chr) <- NULL
 
 
 
@@ -259,6 +315,27 @@ boxplot.Ss4R <- ggplot(Ss4R.chr, aes(x=chr1, y=estimate)) +
 
 boxplot.Ss4R
 
+violinplot.Ss4R <- ggplot(Ss4R.chr[1:4670,], aes(x=chr1, y=estimate)) +
+  geom_violin(fill = fill, color = line, alpha = 0.7) +
+  geom_boxplot(width=0.1) +
+  theme_bw() +
+  labs(x = "Chromosome number", y = "Divergence time after Ss4R (Mya)") +
+  #scale_y_continuous(name = "Divergence time after Ss4R (Mya)") +
+  theme(text = element_text(size = 14),
+        axis.text= element_text(size = 13)) 
+
+violinplot.Ss4R
+
+violinplot.Ss4R <- ggplot(Ss4R.chr[4671:7224,], aes(x=chr1, y=estimate)) +
+  geom_violin(fill = fill, color = line, alpha = 0.7) +
+  geom_boxplot(width=0.1) +
+  theme_bw() +
+  labs(x = "Chromosome number", y = "Divergence time after Ss4R (Mya)") +
+  #scale_y_continuous(name = "Divergence time after Ss4R (Mya)") +
+  theme(text = element_text(size = 14),
+        axis.text= element_text(size = 13)) 
+
+violinplot.Ss4R
 
 #-----------------------------------------#
 ##_____ Make data for circlize plot _____##
@@ -296,5 +373,5 @@ colorit
 
 
 
-write.table(dup.chrom.df.ord, file = "20170918-duplicates_chrompos.txt", 
+write.table(dup.chrom.df.ord, file = "20170919-duplicates_chrompos.txt", 
               append = F, col.names = F, row.names = F, sep = "\t", quote = FALSE)
