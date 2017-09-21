@@ -332,12 +332,12 @@ OG_clans_dupl_Eluc_filt = OG_clans_dupl[which(eluc.tips>0)]
 
 
 save(OG_clans_dupl_Eluc_filt, file = paste('C:/Users/meeldurb/Dropbox/Melanie/',
-                                           '/Beast_dating_salmonids/RData/',
+                                           'Master_internship_phylogenetics/phylogenetics/RData/',
                                            '20170913-Clans_forBEAST_dupssandElucfilt_nt.RData', 
                                            sep = ''))
 OG_clans_dupl <- loadRData(paste('C:/Users/meeldurb/Dropbox/Melanie/',
-                                 '/Beast_dating_salmonids/RData/',
-                                 '20170913-Clans_forBEAST_dupssandElucfilt_nt.RData', 
+                                 'Master_internship_phylogenetics/phylogenetics/RData/',
+                                 '20170918-Clans_forBEAST_dupssandElucfilt_nt.RData', 
                                  sep = ''))
 
 
